@@ -4,12 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>细胞实验工具箱 | Cell Lab Toolkit</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
         :root {
             --primary: #0ea5e9;
@@ -41,7 +36,7 @@
         }
 
         body {
-            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
             background: var(--bg-main);
             color: var(--text-primary);
             line-height: 1.6;
@@ -52,32 +47,27 @@
         .header {
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: white;
-            padding: 20px;
+            padding: 10px 20px;
             text-align: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: var(--shadow-lg);
+            box-shadow: var(--shadow-sm);
         }
 
         .header h1 {
-            font-size: 1.5rem;
+            font-size: 1.15rem;
             font-weight: 600;
             letter-spacing: -0.5px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .header h1 i {
-            font-size: 1.3rem;
+            font-size: 1rem;
         }
 
         .header-subtitle {
-            font-size: 0.85rem;
-            opacity: 0.9;
-            margin-top: 4px;
+            display: none;
         }
 
         /* Navigation */
@@ -86,7 +76,7 @@
             border-bottom: 1px solid var(--border);
             position: sticky;
             top: 0;
-            z-index: 99;
+            z-index: 100;
             overflow-x: auto;
             scrollbar-width: none;
             -ms-overflow-style: none;
@@ -147,6 +137,25 @@
         .nav-tab:hover:not(.active) {
             color: var(--text-primary);
             background: var(--bg-main);
+        }
+
+        .nav-section {
+            font-size: 0.6rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            padding: 2px 6px 0 10px;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            opacity: 0.6;
+            user-select: none;
+        }
+
+        @media (max-width: 768px) {
+            .nav-section {
+                display: none;
+            }
         }
 
         /* Main Content */
@@ -410,6 +419,10 @@
 
         .result-section.hidden {
             display: none;
+        }
+
+        .hidden {
+            display: none !important;
         }
 
         .result-title {
@@ -905,6 +918,7 @@
     <!-- Navigation -->
     <nav class="nav-container">
         <div class="nav-tabs">
+                <span class="nav-section">细胞实验</span>
             <button class="nav-tab active" data-panel="cell-counting">
                 <i class="fas fa-border-all"></i>
                 <span>细胞计数</span>
@@ -913,14 +927,15 @@
                 <i class="fas fa-vial"></i>
                 <span>铺板计算</span>
             </button>
-            <button class="nav-tab" data-panel="density-simulator">
-                <i class="fas fa-microscope"></i>
-                <span>密度可视化</span>
-            </button>
             <button class="nav-tab" data-panel="passage-calculator">
                 <i class="fas fa-sync-alt"></i>
                 <span>传代计算</span>
             </button>
+            <button class="nav-tab" data-panel="density-simulator">
+                <i class="fas fa-microscope"></i>
+                <span>密度可视化</span>
+            </button>
+                <span class="nav-section">药物计算</span>
             <button class="nav-tab" data-panel="molar-calculator">
                 <i class="fas fa-calculator"></i>
                 <span>摩尔计算</span>
@@ -929,17 +944,19 @@
                 <i class="fas fa-tint"></i>
                 <span>药物稀释</span>
             </button>
+                <span class="nav-section">抗体计算</span>
             <button class="nav-tab" data-panel="antibody-dilution">
                 <i class="fas fa-syringe"></i>
                 <span>抗体稀释</span>
             </button>
+            <button class="nav-tab" data-panel="if-staining">
+                <i class="fas fa-palette"></i>
+                <span>IF染色</span>
+            </button>
+                <span class="nav-section">工具</span>
             <button class="nav-tab" data-panel="vessel-converter">
                 <i class="fas fa-exchange-alt"></i>
                 <span>器皿换算</span>
-            </button>
-            <button class="nav-tab" data-panel="unit-converter">
-                <i class="fas fa-ruler"></i>
-                <span>单位换算</span>
             </button>
         </div>
     </nav>
@@ -1251,7 +1268,7 @@
                 </button>
 
                 <div id="passageResult" class="result-section hidden">
-                    <div class="result-grid">
+                    <div id="passageResultValues" class="result-grid">
                         <div class="result-card primary">
                             <div class="label">所需悬液体积</div>
                             <div class="value" id="passageRequiredVol">-</div>
@@ -1475,16 +1492,6 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="input-group">
-                            <label>稀释液类型</label>
-                            <select id="antibodyDiluent">
-                                <option value="5% 脱脂奶粉/TBST">5% 脱脂奶粉/TBST</option>
-                                <option value="5% BSA/TBST">5% BSA/TBST</option>
-                                <option value="TBST">TBST</option>
-                                <option value="PBS">PBS</option>
-                                <option value="其他">其他</option>
-                            </select>
-                        </div>
                     </div>
                 </div>
 
@@ -1507,6 +1514,172 @@
                             <div class="value" id="antibodyFinalConc">-</div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- IF染色模块 -->
+        <div id="if-staining" class="tool-panel">
+            <div class="card">
+                <h2 class="card-title"><i class="fas fa-palette"></i> 免疫荧光染色方案</h2>
+                <p class="card-subtitle">抗体库管理 · 切片级配置 · 智能兼容性检查</p>
+
+                <!-- 实验基本设置 -->
+                <div class="form-grid" style="margin-bottom: 15px;">
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>实验名称</label>
+                            <input type="text" id="ifExpName" placeholder="如：Nestin/GFAP 共染">
+                        </div>
+                        <div class="input-group">
+                            <label>每样本体积 (μL)</label>
+                            <input type="number" id="ifVolumePerSample" value="100" min="1">
+                        </div>
+                        <div class="input-group">
+                            <label>样本类型</label>
+                            <select id="ifSampleType">
+                                <option value="细胞爬片">细胞爬片</option>
+                                <option value="组织切片">组织切片</option>
+                                <option value="96孔板">96孔板</option>
+                                <option value="24孔板">24孔板</option>
+                                <option value="其他">其他</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 抗体库管理 -->
+                <div style="margin-top: 20px;">
+                    <div class="section-title" style="display: flex; justify-content: space-between; align-items: center;">
+                        <span><i class="fas fa-flask"></i> 抗体库</span>
+                        <span style="font-size: 0.78rem; color: var(--text-muted); font-weight: normal;">定义本次实验使用的所有抗体</span>
+                    </div>
+
+                    <!-- 抗体库表格 -->
+                    <div style="overflow-x: auto;">
+                        <table class="reference-table" style="font-size: 0.8rem; width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th>靶标蛋白</th>
+                                    <th>种属</th>
+                                    <th>荧光标记</th>
+                                    <th>类型</th>
+                                    <th>稀释比</th>
+                                    <th>货号</th>
+                                    <th>配对一抗</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ifAbTbody">
+                                <tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 20px;">尚未添加抗体</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- 添加抗体按钮 -->
+                    <button id="ifToggleAbForm" class="btn btn-secondary" style="margin-top: 8px; padding: 6px 14px; font-size: 0.82rem; width: 100%;">
+                        <i class="fas fa-plus"></i> 添加抗体
+                    </button>
+
+                    <!-- 抗体添加表单（默认隐藏） -->
+                    <div id="ifAbForm" style="display: none; margin-top: 10px;">
+                        <div class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; padding: 14px; background: var(--bg-card); border-radius: var(--radius-sm); border: 1px solid var(--border);">
+                            <div class="input-group" style="margin-bottom: 0;">
+                                <label style="font-size: 0.78rem;">靶标蛋白</label>
+                                <input type="text" id="ifAbTarget" placeholder="如：Nestin" style="padding: 7px 8px; font-size: 0.82rem;">
+                            </div>
+                            <div class="input-group" style="margin-bottom: 0;">
+                                <label style="font-size: 0.78rem;">种属来源</label>
+                                <select id="ifAbHost" style="padding: 7px 8px; font-size: 0.82rem;">
+                                    <option value="Mouse">Mouse</option>
+                                    <option value="Rabbit">Rabbit</option>
+                                    <option value="Goat">Goat</option>
+                                    <option value="Chicken">Chicken</option>
+                                    <option value="Rat">Rat</option>
+                                    <option value="Donkey">Donkey</option>
+                                    <option value="Guinea Pig">Guinea Pig</option>
+                                    <option value="Hamster">Hamster</option>
+                                    <option value="Sheep">Sheep</option>
+                                    <option value="Human">Human</option>
+                                    <option value="N/A">— N/A (染料) —</option>
+                                </select>
+                            </div>
+                            <div class="input-group" style="margin-bottom: 0;">
+                                <label style="font-size: 0.78rem;">荧光标记</label>
+                                <select id="ifAbConjugate" style="padding: 7px 8px; font-size: 0.82rem;">
+                                    <option value="Unconjugated">Unconjugated (需二抗)</option>
+                                    <option value="Alexa Fluor 405">Alexa Fluor 405 (蓝)</option>
+                                    <option value="Alexa Fluor 488">Alexa Fluor 488 (绿)</option>
+                                    <option value="Alexa Fluor 594">Alexa Fluor 594 (红/橙)</option>
+                                    <option value="Alexa Fluor 647">Alexa Fluor 647 (远红)</option>
+                                    <option value="Cy3">Cy3 (红/橙)</option>
+                                    <option value="FITC">FITC (绿)</option>
+                                    <option value="TRITC">TRITC (红)</option>
+                                    <option value="DyLight 488">DyLight 488 (绿)</option>
+                                    <option value="DyLight 594">DyLight 594 (红/橙)</option>
+                                    <option value="DyLight 650">DyLight 650 (远红)</option>
+                                    <option value="DAPI">DAPI (核染)</option>
+                                    <option value="Hoechst">Hoechst (核染)</option>
+                                    <option value="Phalloidin">Phalloidin (肌动蛋白)</option>
+                                </select>
+                            </div>
+                            <div class="input-group" style="margin-bottom: 0;">
+                                <label style="font-size: 0.78rem;">类型</label>
+                                <select id="ifAbType" style="padding: 7px 8px; font-size: 0.82rem;">
+                                    <option value="primary">一抗</option>
+                                    <option value="secondary">二抗</option>
+                                    <option value="dye">染料/其他</option>
+                                </select>
+                            </div>
+                            <div class="input-group" style="margin-bottom: 0;">
+                                <label style="font-size: 0.78rem;">稀释比 1:</label>
+                                <input type="number" id="ifAbDilution" value="500" min="1" style="padding: 7px 8px; font-size: 0.82rem;">
+                            </div>
+                            <div class="input-group" style="margin-bottom: 0;">
+                                <label style="font-size: 0.78rem;">货号</label>
+                                <input type="text" id="ifAbCatalog" placeholder="如：AB_123456" style="padding: 7px 8px; font-size: 0.82rem;">
+                            </div>
+                            <div class="input-group" style="margin-bottom: 0; display: none;" id="ifAbSecGroup">
+                                <label style="font-size: 0.78rem;">配对一抗</label>
+                                <select id="ifAbPairedPrimary" style="padding: 7px 8px; font-size: 0.82rem;">
+                                    <option value="">— 请选择 —</option>
+                                </select>
+                                <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 2px;">二抗绑定一抗后，勾选该一抗将自动包含此二抗</div>
+                            </div>
+                            <div style="display: flex; align-items: flex-end; gap: 6px;">
+                                <button id="ifAbAddBtn" class="btn btn-primary" style="padding: 7px 14px; font-size: 0.82rem;"><i class="fas fa-check"></i> 确认添加</button>
+                                <button id="ifAbCancelBtn" class="btn btn-secondary" style="padding: 7px 14px; font-size: 0.82rem;">取消</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 切片设置 -->
+                <div style="margin-top: 24px;">
+                    <div class="section-title"><i class="fas fa-sliders-h"></i> 切片配置</div>
+                    <div class="input-row" style="margin-bottom: 12px;">
+                        <div class="input-group" style="max-width: 200px;">
+                            <label>切片数量</label>
+                            <input type="number" id="ifSlideCount" value="3" min="1" max="20">
+                        </div>
+                    </div>
+                    <div id="ifSlidesContainer"></div>
+                </div>
+
+                <!-- 兼容性检查 -->
+                <div id="ifCompatibilitySection" style="display: none; margin-top: 20px;">
+                    <div class="card-title" style="font-size: 1rem; margin-bottom: 12px;">
+                        <i class="fas fa-shield-alt"></i> 兼容性检查
+                    </div>
+                    <div id="ifChecksContent"></div>
+                </div>
+
+                <!-- 配液方案 -->
+                <div id="ifProtocolSection" style="display: none; margin-top: 20px;">
+                    <div class="card-title" style="font-size: 1rem; margin-bottom: 12px;">
+                        <i class="fas fa-flask"></i> 配液方案 & 抗体用量
+                    </div>
+                    <div id="ifProtocolContent"></div>
                 </div>
             </div>
         </div>
@@ -1612,159 +1785,22 @@
             </div>
         </div>
 
-        <!-- 单位换算模块 -->
-        <div id="unit-converter" class="tool-panel">
-            <div class="card">
-                <h2 class="card-title"><i class="fas fa-ruler"></i> 单位换算工具</h2>
-                
-                <div class="input-group">
-                    <label>换算类型</label>
-                    <select id="conversionType">
-                        <option value="concentration">浓度换算</option>
-                        <option value="volume">体积换算</option>
-                        <option value="mass">质量换算</option>
-                        <option value="cellDensity">细胞密度换算</option>
-                    </select>
-                </div>
+        <!-- 单位换算模块已删除 -->
 
-                <!-- 浓度换算 -->
-                <div id="concentrationConverter" class="form-section" style="margin-top: 20px;">
-                    <div class="section-title">浓度换算</div>
-                    <div class="form-grid">
-                        <div class="input-group">
-                            <label>输入浓度</label>
-                            <div class="input-row">
-                                <input type="number" id="inputConc" min="0" step="0.001">
-                                <select id="inputConcUnit" class="unit-select">
-                                    <option value="mol/L">mol/L</option>
-                                    <option value="mmol/L">mmol/L</option>
-                                    <option value="μmol/L">μmol/L</option>
-                                    <option value="nmol/L">nmol/L</option>
-                                    <option value="mg/mL">mg/mL</option>
-                                    <option value="μg/mL">μg/mL</option>
-                                    <option value="ng/mL">ng/mL</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="input-group">
-                            <label>目标单位</label>
-                            <select id="targetConcUnitConv">
-                                <option value="mol/L">mol/L</option>
-                                <option value="mmol/L">mmol/L</option>
-                                <option value="μmol/L">μmol/L</option>
-                                <option value="nmol/L">nmol/L</option>
-                                <option value="mg/mL">mg/mL</option>
-                                <option value="μg/mL">μg/mL</option>
-                                <option value="ng/mL">ng/mL</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="input-group" id="concMwGroup">
-                        <label>分子量 (g/mol)</label>
-                        <input type="number" id="concMW" min="0" step="0.01" placeholder="摩尔与质量浓度互转时需要">
-                    </div>
-                </div>
-
-                <!-- 体积换算 -->
-                <div id="volumeConverter" class="form-section hidden" style="margin-top: 20px;">
-                    <div class="section-title">体积换算</div>
-                    <div class="form-grid">
-                        <div class="input-group">
-                            <label>输入体积</label>
-                            <div class="input-row">
-                                <input type="number" id="inputVol" min="0" step="0.001">
-                                <select id="inputVolUnit" class="unit-select">
-                                    <option value="L">L</option>
-                                    <option value="mL">mL</option>
-                                    <option value="μL">μL</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="input-group">
-                            <label>目标单位</label>
-                            <select id="targetVolUnit">
-                                <option value="L">L</option>
-                                <option value="mL">mL</option>
-                                <option value="μL">μL</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 质量换算 -->
-                <div id="massConverter" class="form-section hidden" style="margin-top: 20px;">
-                    <div class="section-title">质量换算</div>
-                    <div class="form-grid">
-                        <div class="input-group">
-                            <label>输入质量</label>
-                            <div class="input-row">
-                                <input type="number" id="inputMass" min="0" step="0.001">
-                                <select id="inputMassUnit" class="unit-select">
-                                    <option value="g">g</option>
-                                    <option value="mg">mg</option>
-                                    <option value="μg">μg</option>
-                                    <option value="ng">ng</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="input-group">
-                            <label>目标单位</label>
-                            <select id="targetMassUnit">
-                                <option value="g">g</option>
-                                <option value="mg">mg</option>
-                                <option value="μg">μg</option>
-                                <option value="ng">ng</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 细胞密度换算 -->
-                <div id="cellDensityConverter" class="form-section hidden" style="margin-top: 20px;">
-                    <div class="section-title">细胞密度换算</div>
-                    <div class="form-grid">
-                        <div class="input-group">
-                            <label>输入密度</label>
-                            <div class="input-row">
-                                <input type="number" id="inputCellDensity" min="0" step="1">
-                                <select id="inputCellDensityUnit" class="unit-select">
-                                    <option value="cells/mL">cells/mL</option>
-                                    <option value="cells/μL">cells/μL</option>
-                                    <option value="1e4/mL">×10⁴/mL</option>
-                                    <option value="1e5/mL">×10⁵/mL</option>
-                                    <option value="1e6/mL">×10⁶/mL</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="input-group">
-                            <label>目标单位</label>
-                            <select id="targetCellDensityUnit">
-                                <option value="cells/mL">cells/mL</option>
-                                <option value="cells/μL">cells/μL</option>
-                                <option value="1e4/mL">×10⁴/mL</option>
-                                <option value="1e5/mL">×10⁵/mL</option>
-                                <option value="1e6/mL">×10⁶/mL</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <button id="convertBtn" class="btn btn-primary btn-block" style="margin-top: 20px;">
-                    <i class="fas fa-sync-alt"></i> 换算
-                </button>
-
-                <div id="conversionResult" class="result-section hidden">
-                    <div class="result-title">换算结果</div>
-                    <div class="result-value" id="conversionResultText">-</div>
-                </div>
-            </div>
-        </div>
     </main>
 
     <!-- Footer -->
     <footer class="footer">
         <p>Cell Lab Toolkit v2.0 | 为细胞培养实验设计</p>
-        <p style="margin-top: 5px;">适配移动端与桌面端 | <a href="https://github.com" target="_blank">GitHub</a></p>
+        <div style="margin-top: 10px; display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+            <button onclick="showContactInfo()" class="btn btn-secondary" style="font-size: 0.85rem; padding: 8px 16px;">
+                <i class="fas fa-envelope"></i> 反馈 & 建议
+            </button>
+            <button onclick="historyStore.exportToClipboard()" class="btn btn-secondary" style="font-size: 0.85rem; padding: 8px 16px;">
+                <i class="fas fa-clipboard-list"></i> 导出历史
+            </button>
+        </div>
+        <p style="margin-top: 5px; font-size: 0.8rem;">适配移动端与桌面端</p>
     </footer>
 
     <script>
@@ -1779,6 +1815,70 @@
                 toast.classList.remove('show');
             }, duration);
         }
+
+        // 联系方式
+        function showContactInfo() {
+            const toast = document.getElementById('toast');
+            toast.innerHTML = '<i class="fas fa-envelope"></i> 1356496415@qq.com<br><small>遇到Bug或有改进建议，请发送邮件</small>';
+            toast.className = 'toast info show';
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 5000);
+        }
+
+        // 计算历史存储
+        const historyStore = {
+            maxRecords: 100,
+            save(moduleName, params, results) {
+                try {
+                    const records = JSON.parse(localStorage.getItem('cellCalHistory') || '[]');
+                    records.unshift({
+                        id: Date.now(),
+                        timestamp: new Date().toLocaleString(),
+                        module: moduleName,
+                        params: params,
+                        results: results
+                    });
+                    if (records.length > this.maxRecords) records.pop();
+                    localStorage.setItem('cellCalHistory', JSON.stringify(records));
+                } catch(e) { /* silently fail */ }
+            },
+            getAll() {
+                try {
+                    return JSON.parse(localStorage.getItem('cellCalHistory') || '[]');
+                } catch(e) { return []; }
+            },
+            exportToClipboard() {
+                const records = this.getAll();
+                if (records.length === 0) {
+                    showToast('暂无历史记录', 'warning');
+                    return;
+                }
+                let text = '=== CellCal 计算历史记录 ===\n';
+                text += `导出时间: ${new Date().toLocaleString()}\n`;
+                text += `共 ${records.length} 条记录\n\n`;
+                records.forEach((r, i) => {
+                    text += `--- #${i + 1} [${r.module}] ${r.timestamp} ---\n`;
+                    if (r.params && Object.keys(r.params).length) {
+                        text += '【参数】\n';
+                        Object.entries(r.params).forEach(([k, v]) => { text += `  ${k}: ${v}\n`; });
+                    }
+                    if (r.results && Object.keys(r.results).length) {
+                        text += '【结果】\n';
+                        Object.entries(r.results).forEach(([k, v]) => { text += `  ${k}: ${v}\n`; });
+                    }
+                    text += '\n';
+                });
+                text += '--- CellCal 结束 ---\n';
+                navigator.clipboard.writeText(text).then(() => {
+                    showToast(`已导出 ${records.length} 条记录到剪贴板，请自行粘贴保存`, 'success', 4000);
+                }).catch(() => {
+                    // fallback: 显示在控制台并提示用户
+                    console.log(text);
+                    showToast('自动复制失败，请打开控制台(Ctrl+Shift+I)手动复制', 'warning', 4000);
+                });
+            }
+        };
 
         // 单位转换因子
         const UNIT_FACTORS = {
@@ -1797,11 +1897,6 @@
         // 判断是否是摩尔浓度单位
         function isMolarUnit(unit) {
             return ['mol/L', 'mmol/L', 'μmol/L', 'nmol/L'].includes(unit);
-        }
-
-        // 判断是否是质量浓度单位
-        function isMassConcentrationUnit(unit) {
-            return ['mg/mL', 'μg/mL', 'ng/mL', 'g/L', 'μg/μL'].includes(unit);
         }
 
         // 转换到基础单位
@@ -1833,10 +1928,10 @@
         // 格式化数字显示
         function formatNumber(value, decimals = 4) {
             if (value === 0) return '0';
-            if (Math.abs(value) >= 10000 || Math.abs(value) < 0.0001) {
-                return value.toExponential(decimals);
+            if (Math.abs(value) >= 1e6 || (Math.abs(value) < 1e-6 && value !== 0)) {
+                return value.toExponential(2);
             }
-            return value.toFixed(decimals).replace(/\.?0+$/, '');
+            return Number(value.toFixed(decimals)).toString();
         }
 
         // ==================== 导航功能 ====================
@@ -1853,7 +1948,10 @@
                 
                 toolPanels.forEach(p => p.classList.remove('active'));
                 document.getElementById(panelId).classList.add('active');
-                
+
+                // 自动滚动到顶部
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+
                 // 如果切换到密度可视化面板，初始化canvas
                 if (panelId === 'density-simulator') {
                     setTimeout(() => {
@@ -1884,6 +1982,10 @@
                 if (cell.classList.contains('locked')) return;
                 countingState.counts[gridIndex]++;
                 document.getElementById(`count${gridIndex + 1}`).textContent = countingState.counts[gridIndex];
+                // 震动反馈（仅移动端生效）
+                if (navigator.vibrate) {
+                    navigator.vibrate(15);
+                }
             });
 
             // 长按输入
@@ -1980,10 +2082,9 @@
             document.getElementById('cellDensity').textContent = densityDisplay;
             
             document.getElementById('countingResult').classList.remove('hidden');
+            historyStore.save('细胞计数', {稀释倍数: dilution, 计数格数: validCounts.length}, {平均计数: avgCount.toFixed(1) + ' cells/格', 密度: densityDisplay});
             showToast('计算完成', 'success');
         });
-
-        // ==================== 铺板计算模块 ====================
         
         document.getElementById('calculatePlatingBtn').addEventListener('click', () => {
             const density = parseFloat(document.getElementById('platingDensity').value);
@@ -2022,6 +2123,7 @@
             document.getElementById('platingStockVolume').textContent = `${formatNumber(stockVolume, 2)} μL`;
             document.getElementById('platingDiluentVolume').textContent = `${formatNumber(diluentVolume, 2)} μL`;
             document.getElementById('platingResult').classList.remove('hidden');
+            historyStore.save('铺板计算', {细胞密度: density + densityUnit, 孔数: wellCount, 每孔细胞数: cellsPerWell, 培养基体积: mediumVolume + ' μL/孔'}, {原液: formatNumber(stockVolume, 2) + ' μL', 稀释液: formatNumber(diluentVolume, 2) + ' μL'});
             showToast('计算完成', 'success');
         });
 
@@ -2287,10 +2389,21 @@
             const isInsufficient = totalRequiredCells > totalSourceCells;
 
             // 显示结果
-            document.getElementById('passageRequiredVol').textContent = `${formatNumber(requiredVolume, 3)} mL`;
-            document.getElementById('passagePerVessel').textContent = `${formatNumber(volumePerVessel * 1000, 2)} μL`;
-            document.getElementById('passageRatio').textContent = `1:${formatNumber(passageRatio, 2)}`;
-            document.getElementById('passageTotalCells').textContent = `${formatNumber(totalSourceCells / 1e6, 2)}M`;
+            const passageResultValues = document.getElementById('passageResultValues');
+
+            if (isInsufficient) {
+                passageResultValues.classList.add('hidden');
+                document.getElementById('passageRequiredVol').textContent = '-';
+                document.getElementById('passagePerVessel').textContent = '-';
+                document.getElementById('passageRatio').textContent = '-';
+                document.getElementById('passageTotalCells').textContent = '-';
+            } else {
+                passageResultValues.classList.remove('hidden');
+                document.getElementById('passageRequiredVol').textContent = `${formatNumber(requiredVolume, 2)} mL`;
+                document.getElementById('passagePerVessel').textContent = `${formatNumber(volumePerVessel * 1000, 2)} μL`;
+                document.getElementById('passageRatio').textContent = `1:${formatNumber(passageRatio, 2)}`;
+                document.getElementById('passageTotalCells').textContent = `${formatNumber(totalSourceCells / 1e6, 2)}M`;
+            }
 
             // 生成实验步骤
             const protocolDiv = document.getElementById('passageProtocol');
@@ -2350,6 +2463,7 @@
             }
 
             document.getElementById('passageResult').classList.remove('hidden');
+            historyStore.save('传代计算', {细胞系: cellLineSelect.options[cellLineSelect.selectedIndex].text, 源器皿: sourceArea + ' cm²', 源汇合度: sourceConf + '%', 目标汇合度: targetConf + '%', 目标数量: targetCount}, {所需体积: formatNumber(requiredVolume, 2) + ' mL', 传代比例: '1:' + formatNumber(passageRatio, 2), 总细胞数: formatNumber(totalSourceCells / 1e6, 2) + 'M'});
             showToast('计算完成', 'success');
         });
 
@@ -2376,7 +2490,7 @@
                 { val: conc, name: '浓度' },
                 { val: vol, name: '体积' }
             ];
-            const emptyInputs = inputs.filter(i => isNaN(i.val) || i.val === '');
+            const emptyInputs = inputs.filter(i => isNaN(i.val) || i.val === 0);
 
             if (emptyInputs.length !== 1) {
                 showToast('请恰好留空一个参数进行计算', 'warning');
@@ -2415,6 +2529,7 @@
 
             document.getElementById('molarResultText').textContent = resultText;
             document.getElementById('molarResult').classList.remove('hidden');
+            historyStore.save('摩尔计算', {分子量: mw + ' g/mol', 质量: isNaN(mass) ? '计算值' : mass + massUnit, 浓度: isNaN(conc) ? '计算值' : conc + concUnit, 体积: isNaN(vol) ? '计算值' : vol + volUnit}, {结果: resultText});
             showToast('计算完成', 'success');
         });
 
@@ -2527,6 +2642,7 @@
             document.getElementById('dilutionFold').textContent = `${formatNumber(dilutionFold, 1)}×`;
 
             document.getElementById('dilutionResult').classList.remove('hidden');
+            historyStore.save('药物稀释', {母液浓度: stockConc + ' ' + stockUnit, 目标浓度: targetConc + ' ' + targetUnit, 目标体积: targetVol + ' ' + targetVolUnit}, {所需母液: document.getElementById('dilutionStockVol').textContent, 稀释倍数: document.getElementById('dilutionFold').textContent});
             showToast('计算完成', 'success');
         });
 
@@ -2593,8 +2709,639 @@
             }
 
             document.getElementById('antibodyResult').classList.remove('hidden');
+            historyStore.save('抗体稀释', {稀释比: '1:' + dilutionRatio, 总体积: totalVolume + ' ' + totalVolumeUnit, 原液浓度: isNaN(stockConc) ? '未填' : stockConc + ' ' + stockConcUnit}, {抗体原液: document.getElementById('antibodyVolume').textContent, 稀释液: document.getElementById('antibodyDiluentVol').textContent});
             showToast('计算完成', 'success');
         });
+
+        // ==================== IF染色模块 ====================
+        // 荧光光谱数据 (Ex/Em nm)
+        const FLUOR_SPECTRA = {
+            'Unconjugated': { ex: null, em: null, channel: null },
+            'Alexa Fluor 405': { ex: 401, em: 421, channel: 'DAPI' },
+            'Alexa Fluor 488': { ex: 495, em: 519, channel: 'FITC' },
+            'Alexa Fluor 594': { ex: 590, em: 617, channel: 'TxRed' },
+            'Alexa Fluor 647': { ex: 650, em: 665, channel: 'Cy5' },
+            'Cy3': { ex: 550, em: 570, channel: 'Cy3' },
+            'FITC': { ex: 495, em: 519, channel: 'FITC' },
+            'TRITC': { ex: 557, em: 576, channel: 'Cy3' },
+            'DyLight 488': { ex: 493, em: 518, channel: 'FITC' },
+            'DyLight 594': { ex: 593, em: 618, channel: 'TxRed' },
+            'DyLight 650': { ex: 654, em: 673, channel: 'Cy5' },
+            'DAPI': { ex: 358, em: 461, channel: 'DAPI' },
+            'Hoechst': { ex: 352, em: 461, channel: 'DAPI' },
+            'Phalloidin': { ex: 496, em: 518, channel: 'FITC' }
+        };
+
+        const CHANNEL_OVERLAP_GROUPS = [
+            ['FITC', 'Cy3'],
+            ['DAPI', 'DAPI'],
+            ['TxRed', 'Cy3']
+        ];
+
+        function channelsOverlap(conjA, conjB) {
+            const specA = FLUOR_SPECTRA[conjA];
+            const specB = FLUOR_SPECTRA[conjB];
+            if (!specA || !specB || !specA.channel || !specB.channel) return false;
+            if (specA.channel === specB.channel) return true;
+            return CHANNEL_OVERLAP_GROUPS.some(g =>
+                g.includes(specA.channel) && g.includes(specB.channel)
+            );
+        }
+
+        function speciesMatch(hostA, hostB) {
+            if (hostA === 'N/A' || hostB === 'N/A') return true;
+            return hostA !== hostB;
+        }
+
+        function escHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // ==================== IF State ====================
+        const ifState = {
+            antibodies: [],
+            nextAbId: 1,
+            slides: [],
+            nextSlideId: 1,
+
+            // ---- Antibody CRUD ----
+
+            addAntibody(data) {
+                data.id = this.nextAbId++;
+                this.antibodies.push(data);
+                this.renderAll();
+            },
+
+            removeAntibody(id) {
+                if (!confirm('确定删除此抗体？它将从所有切片中移除。')) return;
+                this.antibodies = this.antibodies.filter(a => a.id !== id);
+                this.slides.forEach(s => {
+                    s.selectedAbIds = s.selectedAbIds.filter(aid => aid !== id);
+                });
+                this.renderAll();
+            },
+
+            // ---- Slides Management ----
+
+            setSlideCount(n) {
+                n = Math.max(1, Math.min(20, n));
+                while (this.slides.length < n) {
+                    const idx = this.slides.length + 1;
+                    this.slides.push({
+                        id: this.nextSlideId++,
+                        name: `切片 ${idx}`,
+                        selectedAbIds: []
+                    });
+                }
+                if (this.slides.length > n) {
+                    this.slides.length = n;
+                }
+                this.renderAll();
+            },
+
+            updateSlideName(id, name) {
+                const slide = this.slides.find(s => s.id === id);
+                if (slide) slide.name = name;
+            },
+
+            toggleSlideSelection(slideId, abId) {
+                const slide = this.slides.find(s => s.id === slideId);
+                if (!slide) return;
+                const idx = slide.selectedAbIds.indexOf(abId);
+                if (idx === -1) {
+                    slide.selectedAbIds.push(abId);
+                } else {
+                    slide.selectedAbIds.splice(idx, 1);
+                }
+                this.renderProtocol();
+            },
+
+            // ---- Rendering ----
+
+            renderAll() {
+                this.renderAbTable();
+                this.renderSlides();
+            },
+
+            renderAbTable() {
+                const tbody = document.getElementById('ifAbTbody');
+                if (!tbody) return;
+
+                if (this.antibodies.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 20px;">尚未添加抗体，点击下方按钮添加</td></tr>';
+                    return;
+                }
+
+                let html = '';
+                this.antibodies.forEach(ab => {
+                    const typeLabel = { primary: '一抗', secondary: '二抗', dye: '染料' }[ab.type] || ab.type;
+                    const abbrev = ab.conjugate === 'Unconjugated' ? '未标记' : ab.conjugate;
+                    let secNote = '—';
+                    if (ab.pairedPrimaryId) {
+                        const paired = this.antibodies.find(a => a.id === ab.pairedPrimaryId);
+                        secNote = paired ? escHtml(paired.target) : '（已删除）';
+                    }
+                    html += `<tr>
+                        <td><strong>${escHtml(ab.target)}</strong></td>
+                        <td>${ab.type === 'dye' ? '—' : escHtml(ab.host)}</td>
+                        <td>${escHtml(abbrev)}</td>
+                        <td>${typeLabel}</td>
+                        <td>1:${ab.dilution}</td>
+                        <td>${ab.catalog || '—'}</td>
+                        <td>${secNote}</td>
+                        <td><button onclick="ifState.removeAntibody(${ab.id})" class="btn btn-secondary" style="padding: 3px 8px; font-size: 0.72rem; color: var(--danger);"><i class="fas fa-trash-alt"></i></button></td>
+                    </tr>`;
+                });
+                tbody.innerHTML = html;
+            },
+
+            renderSlides() {
+                const container = document.getElementById('ifSlidesContainer');
+                if (!container || this.slides.length === 0) return;
+
+                const primaries = this.antibodies.filter(a => a.type === 'primary');
+                const dyes = this.antibodies.filter(a => a.type === 'dye');
+
+                let html = '<div style="display: flex; flex-direction: column; gap: 12px;">';
+
+                this.slides.forEach(slide => {
+                    // Auto-include secondaries from selected primaries
+                    const autoSecIds = [];
+                    slide.selectedAbIds.forEach(abId => {
+                        const ab = this.antibodies.find(a => a.id === abId);
+                        if (ab && ab.type === 'primary') {
+                            this.antibodies.filter(a => a.type === 'secondary' && a.pairedPrimaryId === ab.id).forEach(sec => {
+                                if (!autoSecIds.includes(sec.id)) autoSecIds.push(sec.id);
+                            });
+                        }
+                    });
+                    const totalSelected = slide.selectedAbIds.length + autoSecIds.length;
+
+                    html += `<div class="card" style="background: var(--bg-main); padding: 14px;" data-slide-id="${slide.id}">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                            <span style="font-size: 0.85rem; font-weight: 600; white-space: nowrap; color: var(--primary);">
+                                <i class="fas fa-microscope"></i>
+                            </span>
+                            <input type="text" class="if-slide-name" value="${escHtml(slide.name)}" placeholder="切片名称" style="padding: 6px 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 0.85rem; font-weight: 500; flex: 1; min-width: 120px; background: var(--bg-card);">
+                            <span style="font-size: 0.72rem; color: var(--text-muted); white-space: nowrap;">已选 ${slide.selectedAbIds.length}${autoSecIds.length > 0 ? '+' + autoSecIds.length : ''}</span>
+                        </div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 6px;">`;
+
+                    // 一抗 group
+                    if (primaries.length > 0) {
+                        html += `<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px; padding: 4px 8px; background: var(--bg-card); border-radius: var(--radius-sm); border: 1px solid var(--border);">
+                            <span style="font-size: 0.72rem; font-weight: 600; color: #4a90d9; margin-right: 2px;">一抗:</span>`;
+                        primaries.forEach(ab => {
+                            const checked = slide.selectedAbIds.includes(ab.id) ? 'checked' : '';
+                            html += `<label style="font-size: 0.75rem; display: inline-flex; align-items: center; gap: 3px; padding: 2px 6px; border-radius: 3px; cursor: pointer; ${checked ? 'background: #4a90d922; border: 1px solid #4a90d944;' : ''}">
+                                <input type="checkbox" class="if-ab-check" data-slide-id="${slide.id}" data-ab-id="${ab.id}" ${checked}>
+                                ${escHtml(ab.target)}
+                            </label>`;
+                        });
+                        html += `</div>`;
+                    }
+
+                    // Auto-included secondary info
+                    if (autoSecIds.length > 0) {
+                        html += `<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px; padding: 4px 8px; background: var(--bg-card); border-radius: var(--radius-sm); border: 1px solid var(--border); opacity: 0.75;">
+                            <span style="font-size: 0.72rem; font-weight: 600; color: #e67e22; margin-right: 2px;">↳ 自动二抗:</span>`;
+                        autoSecIds.forEach(secId => {
+                            const sec = this.antibodies.find(a => a.id === secId);
+                            if (sec) {
+                                html += `<span style="font-size: 0.75rem; padding: 2px 6px; color: #e67e22;">${escHtml(sec.target)}</span>`;
+                            }
+                        });
+                        html += `</div>`;
+                    }
+
+                    // 染料 group
+                    if (dyes.length > 0) {
+                        html += `<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px; padding: 4px 8px; background: var(--bg-card); border-radius: var(--radius-sm); border: 1px solid var(--border);">
+                            <span style="font-size: 0.72rem; font-weight: 600; color: #27ae60; margin-right: 2px;">染料:</span>`;
+                        dyes.forEach(ab => {
+                            const checked = slide.selectedAbIds.includes(ab.id) ? 'checked' : '';
+                            html += `<label style="font-size: 0.75rem; display: inline-flex; align-items: center; gap: 3px; padding: 2px 6px; border-radius: 3px; cursor: pointer; ${checked ? 'background: #27ae6022; border: 1px solid #27ae6044;' : ''}">
+                                <input type="checkbox" class="if-ab-check" data-slide-id="${slide.id}" data-ab-id="${ab.id}" ${checked}>
+                                ${escHtml(ab.target)}
+                            </label>`;
+                        });
+                        html += `</div>`;
+                    }
+
+                    html += `</div></div>`;
+                });
+
+                html += '</div>';
+                container.innerHTML = html;
+
+                // Slide name input → save on input
+                container.querySelectorAll('.if-slide-name').forEach(input => {
+                    input.addEventListener('input', () => {
+                        const el = input.closest('[data-slide-id]');
+                        if (!el) return;
+                        this.updateSlideName(parseInt(el.dataset.slideId), input.value);
+                    });
+                });
+
+                // Checkbox change
+                container.querySelectorAll('.if-ab-check').forEach(cb => {
+                    cb.addEventListener('change', () => {
+                        this.toggleSlideSelection(
+                            parseInt(cb.dataset.slideId),
+                            parseInt(cb.dataset.abId)
+                        );
+                    });
+                });
+
+                this.renderProtocol();
+            },
+
+            // ---- Protocol & Checks ----
+
+            renderProtocol() {
+                const checksSection = document.getElementById('ifCompatibilitySection');
+                const checksContent = document.getElementById('ifChecksContent');
+                const protocolSection = document.getElementById('ifProtocolSection');
+                const protocolContent = document.getElementById('ifProtocolContent');
+                if (!checksContent || !protocolContent) return;
+
+                const volPerSample = parseFloat(document.getElementById('ifVolumePerSample').value) || 100;
+
+                // --- Helper: expand slide selections to include auto secondaries ---
+                const getSlideAbs = (slide) => {
+                    const direct = slide.selectedAbIds.map(id => this.antibodies.find(a => a.id === id)).filter(Boolean);
+                    const secs = [];
+                    direct.filter(a => a.type === 'primary').forEach(pri => {
+                        this.antibodies.filter(a => a.type === 'secondary' && a.pairedPrimaryId === pri.id).forEach(sec => {
+                            if (!secs.find(s => s.id === sec.id)) secs.push(sec);
+                        });
+                    });
+                    return [...direct, ...secs];
+                };
+
+                // Build selected map (includes auto secondaries)
+                const selectedMap = {};
+                this.slides.forEach(slide => {
+                    const allAbs = getSlideAbs(slide);
+                    allAbs.forEach(ab => {
+                        if (!selectedMap[ab.id]) {
+                            selectedMap[ab.id] = { antibody: ab, slides: [] };
+                        }
+                        selectedMap[ab.id].slides.push(slide.name || `切片 ${slide.id}`);
+                    });
+                });
+
+                const selectedList = Object.values(selectedMap);
+                const hasSelection = selectedList.length > 0;
+
+                // ---- Compatibility Checks (per slide, based on primary selections) ----
+                let checkHtml = '';
+                if (hasSelection) {
+                    this.slides.forEach(slide => {
+                        const abs = getSlideAbs(slide);
+                        if (abs.length < 2) return;
+
+                        const primaries = abs.filter(a => a.type === 'primary');
+                        const conjugated = abs.filter(a => a.conjugate !== 'Unconjugated' && a.type !== 'secondary');
+
+                        for (let i = 0; i < primaries.length; i++) {
+                            for (let j = i + 1; j < primaries.length; j++) {
+                                if (!speciesMatch(primaries[i].host, primaries[j].host)) {
+                                    checkHtml += `<div style="padding: 8px 12px; margin-bottom: 6px; background: var(--bg-card); border-radius: var(--radius-sm); border-left: 3px solid var(--danger); font-size: 0.82rem;">
+                                        <i class="fas fa-times-circle" style="color: var(--danger);"></i>
+                                        <strong>${escHtml(slide.name)}</strong>：种属冲突 —
+                                        ${escHtml(primaries[i].target)} (${escHtml(primaries[i].host)}) 与
+                                        ${escHtml(primaries[j].target)} (${escHtml(primaries[j].host)}) 同种属，无法共染！
+                                        <span style="display: block; font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">建议分两轮染色或更换种属。</span>
+                                    </div>`;
+                                }
+                            }
+                        }
+
+                        for (let i = 0; i < conjugated.length; i++) {
+                            for (let j = i + 1; j < conjugated.length; j++) {
+                                if (channelsOverlap(conjugated[i].conjugate, conjugated[j].conjugate)) {
+                                    const spec = FLUOR_SPECTRA[conjugated[i].conjugate];
+                                    checkHtml += `<div style="padding: 8px 12px; margin-bottom: 6px; background: var(--bg-card); border-radius: var(--radius-sm); border-left: 3px solid var(--warning); font-size: 0.82rem;">
+                                        <i class="fas fa-exclamation-triangle" style="color: var(--warning);"></i>
+                                        <strong>${escHtml(slide.name)}</strong>：荧光串色 —
+                                        ${escHtml(conjugated[i].target)} (${conjugated[i].conjugate}) 与
+                                        ${escHtml(conjugated[j].target)} (${conjugated[j].conjugate})
+                                        通道 (${spec ? spec.channel : '?'}) 重叠
+                                        <span style="display: block; font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">建议更换荧光标记。</span>
+                                    </div>`;
+                                }
+                            }
+                        }
+
+                        // Unconjugated → check paired secondary exists
+                        primaries.filter(a => a.conjugate === 'Unconjugated').forEach(uc => {
+                            const hasSec = abs.some(a => a.type === 'secondary' && a.pairedPrimaryId === uc.id);
+                            if (!hasSec) {
+                                checkHtml += `<div style="padding: 8px 12px; margin-bottom: 6px; background: var(--bg-card); border-radius: var(--radius-sm); border-left: 3px solid var(--warning); font-size: 0.82rem;">
+                                    <i class="fas fa-exclamation-triangle" style="color: var(--warning);"></i>
+                                    <strong>${escHtml(slide.name)}</strong>：${escHtml(uc.target)} 未标记，未配对二抗！
+                                </div>`;
+                            }
+                        });
+                    });
+                }
+
+                if (checkHtml) {
+                    checksSection.style.display = 'block';
+                    checksContent.innerHTML = checkHtml;
+                } else if (hasSelection) {
+                    checksSection.style.display = 'block';
+                    checksContent.innerHTML = `<div style="padding: 8px 12px; background: var(--bg-card); border-radius: var(--radius-sm); border-left: 3px solid #27ae60; font-size: 0.82rem;">
+                        <i class="fas fa-check-circle" style="color: #27ae60;"></i> 所有切片兼容性检查通过
+                    </div>`;
+                } else {
+                    checksSection.style.display = 'none';
+                }
+
+                // ---- Protocol ----
+                if (!hasSelection) {
+                    protocolSection.style.display = 'none';
+                    return;
+                }
+
+                protocolSection.style.display = 'block';
+                let html = '';
+
+                // Summary
+                html += `<div class="info-grid" style="margin-bottom: 15px;">
+                    <div class="info-item"><span class="info-label">切片数</span><span class="info-value">${this.slides.length}</span></div>
+                    <div class="info-item"><span class="info-label">抗体种类</span><span class="info-value">${selectedList.length}</span></div>
+                    <div class="info-item"><span class="info-label">每样本体积</span><span class="info-value">${volPerSample} μL</span></div>
+                </div>`;
+
+                // Antibody usage summary
+                html += `<details open style="margin-bottom: 15px;">
+                    <summary style="font-size: 0.85rem; padding: 8px 12px; background: var(--bg-card); border-radius: var(--radius-sm); cursor: pointer;">
+                        <i class="fas fa-cube"></i> 抗体用量汇总
+                    </summary>
+                    <table class="reference-table" style="font-size: 0.8rem; margin-top: 8px;">
+                        <thead><tr><th>抗体</th><th>类型</th><th>稀释比</th><th>使用切片</th><th>每片量</th><th>总需量</th></tr></thead>
+                        <tbody>
+                            ${selectedList.map(item => {
+                                const ab = item.antibody;
+                                const v = volPerSample / ab.dilution;
+                                const total = v * item.slides.length * 1.1;
+                                const tl = { primary: '一抗', secondary: '二抗', dye: '染料' }[ab.type] || ab.type;
+                                return `<tr>
+                                    <td><strong>${escHtml(ab.target)}</strong>${ab.catalog ? ' (' + escHtml(ab.catalog) + ')' : ''}</td>
+                                    <td>${tl}</td>
+                                    <td>1:${ab.dilution}</td>
+                                    <td>${item.slides.map(s => escHtml(s)).join(', ')}</td>
+                                    <td>${v.toFixed(2)} μL</td>
+                                    <td><strong>${total.toFixed(1)} μL</strong></td>
+                                </tr>`;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </details>`;
+
+                // Per-panel protocol — group slides by identical selections
+                html += `<div style="font-size: 0.85rem; font-weight: 600; margin-bottom: 10px;">
+                    <i class="fas fa-microscope"></i> 配液方案
+                </div>`;
+
+                // Group slides by sorted selectedAbIds
+                const groupMap = {};
+                this.slides.forEach(slide => {
+                    const key = [...slide.selectedAbIds].sort().join(',');
+                    if (!groupMap[key]) groupMap[key] = { slides: [], key: key };
+                    groupMap[key].slides.push(slide);
+                });
+
+                Object.values(groupMap).forEach(group => {
+                    const slide = group.slides[0];
+                    const allAbs = getSlideAbs(slide);
+                    if (allAbs.length === 0) {
+                        html += `<div class="card" style="background: var(--bg-main); padding: 12px; margin-bottom: 10px; border-left: 3px solid var(--text-muted);">
+                            <div style="font-size: 0.82rem; font-weight: 600; margin-bottom: 4px;">
+                                未勾选抗体 —— ${group.slides.map(s => escHtml(s.name)).join('、')}
+                            </div>
+                        </div>`;
+                        return;
+                    }
+
+                    const primaries = allAbs.filter(a => a.type === 'primary');
+                    const secondaries = allAbs.filter(a => a.type === 'secondary');
+                    const dyes = allAbs.filter(a => a.type === 'dye');
+                    const hasConflict = (() => {
+                        for (let i = 0; i < primaries.length; i++)
+                            for (let j = i + 1; j < primaries.length; j++)
+                                if (!speciesMatch(primaries[i].host, primaries[j].host)) return true;
+                        return false;
+                    })();
+
+                    html += `<div class="card" style="background: var(--bg-main); padding: 12px; margin-bottom: 10px; border-left: 3px solid var(--primary);">
+                        <div style="font-size: 0.82rem; font-weight: 600; margin-bottom: 6px; color: var(--primary);">
+                            <i class="fas fa-microscope"></i> ${group.slides.map(s => escHtml(s.name)).join('、')}
+                        </div>`;
+
+                    // Variable steps only: Primary → Secondary → Dye
+                    // (Blocking, washing, mounting are standard for all slides)
+
+                    // Primary incubation
+                    if (primaries.length > 0) {
+                        html += `<div style="padding: 6px 10px; margin-bottom: 4px; font-size: 0.8rem; background: var(--bg-card); border-radius: var(--radius-sm); border-left: 2px solid #4a90d9;">`;
+                        if (!hasConflict) {
+                            const mixLines = primaries.map(ab =>
+                                `${escHtml(ab.host)} anti-${escHtml(ab.target)} (1:${ab.dilution})`
+                            );
+                            html += `<strong>一抗孵育</strong> ${primaries.length > 1 ? '<span style="color: #4a90d9;">(混合共染)</span>' : ''}
+                                <div style="margin-top: 2px; display: flex; flex-wrap: wrap; gap: 4px 12px;">
+                                    ${mixLines.map((line, i) => {
+                                        const ab = primaries[i];
+                                        const v = volPerSample / ab.dilution;
+                                        return `<span style="white-space: nowrap;">${line} → <strong>${v.toFixed(2)} μL</strong></span>`;
+                                    }).join('')}
+                                </div>`;
+                            const totalAbVol = primaries.reduce((s, ab) => s + volPerSample / ab.dilution, 0);
+                            html += `<div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">
+                                + 稀释液 <strong>${(volPerSample - Math.min(totalAbVol, volPerSample)).toFixed(2)} μL</strong>
+                                = 总体积 <strong>${volPerSample.toFixed(1)} μL/每片</strong>，4°C 过夜
+                            </div>`;
+                        } else {
+                            html += `<strong>一抗孵育</strong> <span style="color: var(--warning);">⚠️ 种属冲突，需分轮</span>`;
+                            primaries.forEach(ab => {
+                                const v = volPerSample / ab.dilution;
+                                html += `<div style="margin-top: 2px;">• ${escHtml(ab.host)} anti-${escHtml(ab.target)} (1:${ab.dilution}) → ${v.toFixed(2)} μL（单独）</div>`;
+                            });
+                        }
+                        html += `</div>`;
+                    }
+
+                    // Secondary incubation
+                    if (secondaries.length > 0) {
+                        const secLines = secondaries.map(ab =>
+                            `${escHtml(ab.target)} (1:${ab.dilution})`
+                        );
+                        html += `<div style="padding: 6px 10px; margin-bottom: 4px; font-size: 0.8rem; background: var(--bg-card); border-radius: var(--radius-sm); border-left: 2px solid #e67e22;">
+                            <strong>二抗孵育</strong> ⚠️ 避光
+                            <div style="margin-top: 2px; display: flex; flex-wrap: wrap; gap: 4px 12px;">
+                                ${secLines.map((line, i) => {
+                                    const v = volPerSample / secondaries[i].dilution;
+                                    return `<span style="white-space: nowrap;">${line} → <strong>${v.toFixed(2)} μL</strong></span>`;
+                                }).join('')}
+                            </div>
+                            <div style="font-size: 0.72rem; color: var(--text-muted);">室温避光 1 h</div>
+                        </div>`;
+                    }
+
+                    // Dye
+                    if (dyes.length > 0) {
+                        html += `<div style="padding: 6px 10px; margin-bottom: 4px; font-size: 0.8rem; background: var(--bg-card); border-radius: var(--radius-sm); border-left: 2px solid #27ae60;">
+                            <strong>复染</strong> — ${dyes.map(ab => `${escHtml(ab.target)} (1:${ab.dilution}) → ${(volPerSample / ab.dilution).toFixed(2)} μL`).join(', ')}
+                            <div style="font-size: 0.72rem; color: var(--text-muted);">室温 5-15 min</div>
+                        </div>`;
+                    }
+
+                    // Standard note
+                    html += `<div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 6px; border-top: 1px dashed var(--border); padding-top: 6px;">
+                        <span>所有切片标准步骤：封闭 → 各抗体步骤 → PBST 洗涤 ×3 → 封片</span>
+                    </div>`;
+
+                    // Channel guide
+                    const conjugated = allAbs.filter(a => a.conjugate !== 'Unconjugated' && a.type !== 'secondary');
+                    if (conjugated.length > 0) {
+                        html += `<details style="margin-top: 6px; font-size: 0.78rem;">
+                            <summary style="cursor: pointer; color: var(--text-muted); padding: 2px 0;"><i class="fas fa-eye"></i> 成像通道</summary>
+                            <div style="padding: 6px; background: var(--bg-card); border-radius: var(--radius-sm); margin-top: 4px;">
+                                ${conjugated.map(ab => {
+                                    const spec = FLUOR_SPECTRA[ab.conjugate];
+                                    return `<div style="display: flex; justify-content: space-between; padding: 2px 0;">
+                                        <span>${escHtml(ab.target)}</span>
+                                        <span>${escHtml(ab.conjugate)}</span>
+                                        <span style="color: var(--text-muted);">${spec ? spec.channel + ' (' + spec.ex + '/' + spec.em + ' nm)' : '—'}</span>
+                                    </div>`;
+                                }).join('')}
+                            </div>
+                        </details>`;
+                    }
+
+                    html += `</div>`;
+                });
+
+                protocolContent.innerHTML = html;
+            }
+        };
+
+        // ==================== Event Listeners ====================
+
+        // Toggle antibody add form
+        document.getElementById('ifToggleAbForm').addEventListener('click', () => {
+            const f = document.getElementById('ifAbForm');
+            f.style.display = f.style.display === 'none' ? 'block' : 'none';
+        });
+
+        document.getElementById('ifAbCancelBtn').addEventListener('click', () => {
+            document.getElementById('ifAbForm').style.display = 'none';
+        });
+
+        // Type → secondary: show secondary target group
+        document.getElementById('ifAbType').addEventListener('change', (e) => {
+            const g = document.getElementById('ifAbSecGroup');
+            if (e.target.value === 'secondary') {
+                g.style.display = 'block';
+                // Populate paired primary dropdown with current primaries
+                const sel = document.getElementById('ifAbPairedPrimary');
+                const currentVal = sel.value;
+                sel.innerHTML = '<option value="">— 选择一抗 —</option>';
+                ifState.antibodies.filter(a => a.type === 'primary').forEach(ab => {
+                    sel.innerHTML += `<option value="${ab.id}">${escHtml(ab.target)} (${escHtml(ab.host)})</option>`;
+                });
+                sel.value = currentVal;
+            } else {
+                g.style.display = 'none';
+            }
+        });
+
+        // Paired primary → auto-fill antibody name from primary's host
+        document.getElementById('ifAbPairedPrimary').addEventListener('change', (e) => {
+            const target = document.getElementById('ifAbTarget');
+            const host = document.getElementById('ifAbHost');
+            const abId = parseInt(e.target.value);
+            if (abId) {
+                const primary = ifState.antibodies.find(a => a.id === abId);
+                if (primary) {
+                    target.value = 'anti-' + primary.host + ' IgG';
+                    if (host.value === 'N/A' || host.value === '') {
+                        host.value = 'Goat';
+                    }
+                }
+            }
+        });
+
+        // Add antibody
+        document.getElementById('ifAbAddBtn').addEventListener('click', () => {
+            const target = document.getElementById('ifAbTarget').value.trim();
+            const host = document.getElementById('ifAbHost').value;
+            const conjugate = document.getElementById('ifAbConjugate').value;
+            const type = document.getElementById('ifAbType').value;
+            const dilution = parseInt(document.getElementById('ifAbDilution').value);
+            const catalog = document.getElementById('ifAbCatalog').value.trim();
+            const pairedId = parseInt(document.getElementById('ifAbPairedPrimary').value) || 0;
+
+            if (!target) { showToast('请输入靶标蛋白名称', 'warning'); return; }
+            if (isNaN(dilution) || dilution < 1) { showToast('请输入有效稀释比', 'warning'); return; }
+            if (type !== 'dye' && host === 'N/A') { showToast('请选择种属来源', 'warning'); return; }
+            if (type === 'secondary' && !pairedId) { showToast('请选择二抗配对的抗体', 'warning'); return; }
+
+            ifState.addAntibody({
+                target, host, conjugate, type, dilution,
+                catalog: catalog,
+                pairedPrimaryId: type === 'secondary' ? pairedId : 0
+            });
+
+            document.getElementById('ifAbTarget').value = '';
+            document.getElementById('ifAbCatalog').value = '';
+            document.getElementById('ifAbForm').style.display = 'none';
+            showToast(`已添加 ${target}`, 'success');
+        });
+
+        // Enter key to add
+        document.getElementById('ifAbTarget').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') document.getElementById('ifAbAddBtn').click();
+        });
+        document.getElementById('ifAbDilution').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') document.getElementById('ifAbAddBtn').click();
+        });
+
+        // Slide count change
+        document.getElementById('ifSlideCount').addEventListener('change', (e) => {
+            ifState.setSlideCount(parseInt(e.target.value) || 1);
+        });
+
+        // Volume change
+        document.getElementById('ifVolumePerSample').addEventListener('change', () => {
+            ifState.renderProtocol();
+        });
+
+        // ==================== Initialize ====================
+        ifState.addAntibody({
+            target: 'Nestin',
+            host: 'Mouse',
+            conjugate: 'Alexa Fluor 488',
+            type: 'primary',
+            dilution: 200,
+            catalog: 'AB_12345',
+            secondaryTarget: ''
+        });
+        ifState.addAntibody({
+            target: 'GFAP',
+            host: 'Rabbit',
+            conjugate: 'Alexa Fluor 594',
+            type: 'primary',
+            dilution: 300,
+            catalog: 'AB_67890',
+            secondaryTarget: ''
+        });
+        ifState.setSlideCount(3);
 
         // ==================== 器皿换算模块 ====================
         
@@ -2617,127 +3364,7 @@
         document.getElementById('vesselSourceType').addEventListener('change', calculateVesselConversion);
         document.getElementById('vesselTargetType').addEventListener('change', calculateVesselConversion);
         
-        // ==================== 单位换算模块 ====================
-        
-        const converterSections = {
-            'concentration': document.getElementById('concentrationConverter'),
-            'volume': document.getElementById('volumeConverter'),
-            'mass': document.getElementById('massConverter'),
-            'cellDensity': document.getElementById('cellDensityConverter')
-        };
-
-        document.getElementById('conversionType').addEventListener('change', (e) => {
-            Object.values(converterSections).forEach(s => s.classList.add('hidden'));
-            converterSections[e.target.value].classList.remove('hidden');
-            document.getElementById('conversionResult').classList.add('hidden');
-        });
-
-        // 监听浓度单位变化，显示/隐藏分子量
-        function checkConcUnits() {
-            const inputUnit = document.getElementById('inputConcUnit').value;
-            const targetUnit = document.getElementById('targetConcUnitConv').value;
-            const mwGroup = document.getElementById('concMwGroup');
-            
-            const inputIsMolar = isMolarUnit(inputUnit);
-            const targetIsMolar = isMolarUnit(targetUnit);
-            
-            if (inputIsMolar !== targetIsMolar) {
-                mwGroup.style.display = 'block';
-            } else {
-                mwGroup.style.display = 'none';
-            }
-        }
-
-        document.getElementById('inputConcUnit').addEventListener('change', checkConcUnits);
-        document.getElementById('targetConcUnitConv').addEventListener('change', checkConcUnits);
-
-        document.getElementById('convertBtn').addEventListener('click', () => {
-            const type = document.getElementById('conversionType').value;
-            let result, resultText;
-
-            if (type === 'concentration') {
-                const inputConc = parseFloat(document.getElementById('inputConc').value);
-                const inputUnit = document.getElementById('inputConcUnit').value;
-                const targetUnit = document.getElementById('targetConcUnitConv').value;
-                const mw = parseFloat(document.getElementById('concMW').value);
-
-                if (isNaN(inputConc) || inputConc <= 0) {
-                    showToast('请输入有效的浓度值', 'warning');
-                    return;
-                }
-
-                const inputIsMolar = isMolarUnit(inputUnit);
-                const targetIsMolar = isMolarUnit(targetUnit);
-
-                if (inputIsMolar && targetIsMolar) {
-                    const base = toBaseUnit(inputConc, inputUnit, 'molar');
-                    result = fromBaseUnit(base, targetUnit, 'molar');
-                } else if (!inputIsMolar && !targetIsMolar) {
-                    const base = toBaseUnit(inputConc, inputUnit, 'massConc');
-                    result = fromBaseUnit(base, targetUnit, 'massConc');
-                } else {
-                    if (isNaN(mw) || mw <= 0) {
-                        showToast('摩尔与质量浓度互转需要分子量', 'warning');
-                        return;
-                    }
-                    if (inputIsMolar) {
-                        // mol/L -> mg/mL: C(mg/mL) = C(mol/L) × MW
-                        const molPerL = toBaseUnit(inputConc, inputUnit, 'molar');
-                        const mgPerML = molPerL * mw;
-                        result = fromBaseUnit(mgPerML, targetUnit, 'massConc');
-                    } else {
-                        // mg/mL -> mol/L: C(mol/L) = C(mg/mL) / MW
-                        const mgPerML = toBaseUnit(inputConc, inputUnit, 'massConc');
-                        const molPerL = mgPerML / mw;
-                        result = fromBaseUnit(molPerL, targetUnit, 'molar');
-                    }
-                }
-                resultText = `${formatNumber(result)} ${targetUnit}`;
-            } else if (type === 'volume') {
-                const inputVol = parseFloat(document.getElementById('inputVol').value);
-                const inputUnit = document.getElementById('inputVolUnit').value;
-                const targetUnit = document.getElementById('targetVolUnit').value;
-
-                if (isNaN(inputVol) || inputVol <= 0) {
-                    showToast('请输入有效的体积值', 'warning');
-                    return;
-                }
-
-                const base = toBaseUnit(inputVol, inputUnit, 'volume');
-                result = fromBaseUnit(base, targetUnit, 'volume');
-                resultText = `${formatNumber(result, 6)} ${targetUnit}`;
-            } else if (type === 'mass') {
-                const inputMass = parseFloat(document.getElementById('inputMass').value);
-                const inputUnit = document.getElementById('inputMassUnit').value;
-                const targetUnit = document.getElementById('targetMassUnit').value;
-
-                if (isNaN(inputMass) || inputMass <= 0) {
-                    showToast('请输入有效的质量值', 'warning');
-                    return;
-                }
-
-                const base = toBaseUnit(inputMass, inputUnit, 'mass');
-                result = fromBaseUnit(base, targetUnit, 'mass');
-                resultText = `${formatNumber(result, 6)} ${targetUnit}`;
-            } else if (type === 'cellDensity') {
-                const inputDensity = parseFloat(document.getElementById('inputCellDensity').value);
-                const inputUnit = document.getElementById('inputCellDensityUnit').value;
-                const targetUnit = document.getElementById('targetCellDensityUnit').value;
-
-                if (isNaN(inputDensity) || inputDensity <= 0) {
-                    showToast('请输入有效的细胞密度值', 'warning');
-                    return;
-                }
-
-                const base = toBaseUnit(inputDensity, inputUnit, 'cellDensity');
-                result = fromBaseUnit(base, targetUnit, 'cellDensity');
-                resultText = `${formatNumber(result, 2)} ${targetUnit.replace('1e', '×10^').replace('/mL', '/mL')}`;
-            }
-
-            document.getElementById('conversionResultText').textContent = resultText;
-            document.getElementById('conversionResult').classList.remove('hidden');
-            showToast('换算完成', 'success');
-        });
+        // ==================== 单位换算模块（已删除） ====================
 
         // ==================== 初始化 ====================
         
@@ -2749,7 +3376,6 @@
             }, 100);
             calculateVesselConversion();
             checkDilutionUnits();
-            checkConcUnits();
         });
 
         window.addEventListener('resize', () => {
