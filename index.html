@@ -3,20 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>细胞实验工具箱 | Cell Lab Toolkit</title>
+<title>生物实验工具箱 | BioLab Toolkit</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
 :root {
     --bg-deep: #060b14;
     --bg-main: #0a0f1a;
-    --bg-card: rgba(255,255,255,0.04);
+    --bg-card: rgba(255,255,255,0.06);
     --bg-card-hover: rgba(255,255,255,0.06);
     --bg-input: rgba(255,255,255,0.05);
     --border: rgba(255,255,255,0.08);
     --border-focus: rgba(16,185,129,0.35);
-    --text: #e2e8f0;
+    --text: #e8edf3;
     --text-secondary: #94a3b8;
-    --text-muted: #64748b;
+    --text-muted: #8b9db5;
     --emerald: #34d399;
     --emerald-dark: #059669;
     --emerald-bg: rgba(16,185,129,0.08);
@@ -35,14 +35,14 @@
 [data-theme="light"] {
     --bg-deep: #f1f5f9;
     --bg-main: #f8fafc;
-    --bg-card: rgba(0,0,0,0.02);
+    --bg-card: rgba(0,0,0,0.03);
     --bg-card-hover: rgba(0,0,0,0.04);
     --bg-input: rgba(0,0,0,0.03);
     --border: rgba(0,0,0,0.08);
     --border-focus: rgba(16,185,129,0.5);
-    --text: #1e293b;
-    --text-secondary: #64748b;
-    --text-muted: #94a3b8;
+    --text: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #5e6f82;
     --emerald: #10b981;
     --emerald-dark: #059669;
     --emerald-bg: rgba(16,185,129,0.06);
@@ -134,8 +134,8 @@ body {
     color: var(--emerald); font-size: 1rem;
 }
 .cat-name { font-weight: 600; font-size: 0.95rem; }
-.cat-eng { color: var(--text-muted); font-size: 0.7rem; }
-.cat-count { margin-left: auto; color: var(--text-muted); font-size: 0.7rem; }
+.cat-eng { color: var(--text-muted); font-size: 0.73rem; }
+.cat-count { margin-left: auto; color: var(--text-muted); font-size: 0.73rem; }
 
 .tool-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
 
@@ -158,8 +158,21 @@ body {
     transition: var(--transition);
 }
 .tool-card:hover .tool-icon { background: rgba(16,185,129,0.15); color: var(--emerald); }
-.tool-card .tool-name { font-weight: 500; font-size: 0.82rem; margin-bottom: 2px; }
-.tool-card .tool-eng { color: var(--text-muted); font-size: 0.62rem; }
+.tool-card .tool-name { font-weight: 500; font-size: 0.84rem; margin-bottom: 2px; }
+.tool-card .tool-eng { color: var(--text-muted); font-size: 0.67rem; }
+.density-icon-custom {
+    width: 20px; height: 20px;
+    border: 2px solid var(--emerald);
+    border-radius: 50%;
+    position: relative;
+}
+.density-icon-custom::before {
+    content: '';
+    position: absolute; inset: 3px;
+    background-image: radial-gradient(circle, var(--emerald) 1.5px, transparent 1.5px);
+    background-size: 6px 6px;
+    border-radius: 50%;
+}
 
 /* ===== TOOL PANEL ===== */
 .tool-panel { display: none; animation: fadeIn 0.3s ease; }
@@ -175,7 +188,7 @@ body {
 }
 .card-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
 .card-title i { color: var(--emerald); }
-.card-subtitle { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 16px; }
+.card-subtitle { font-size: 0.84rem; color: var(--text-muted); margin-bottom: 16px; }
 
 /* ===== FORM ELEMENTS ===== */
 .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
@@ -187,7 +200,7 @@ body {
 .form-section.purple { border-left-color: #a78bfa; }
 .form-section.green { border-left-color: var(--emerald); }
 .form-section.orange { border-left-color: var(--warning); }
-.section-title { font-weight: 600; margin-bottom: 14px; font-size: 0.9rem; }
+.section-title { font-weight: 600; margin-bottom: 14px; font-size: 0.92rem; }
 
 .input-group { margin-bottom: 14px; }
 .input-group:last-child { margin-bottom: 0; }
@@ -205,9 +218,9 @@ body {
 .input-row { display: flex; gap: 10px; }
 .input-row > * { flex: 1; }
 .input-row > .unit-select { flex: 0 0 100px; }
-.input-hint { font-size: 0.72rem; color: var(--text-muted); margin-top: 4px; }
-.input-warning { font-size: 0.72rem; color: var(--warning); margin-top: 4px; }
-.input-error { font-size: 0.72rem; color: var(--danger); margin-top: 4px; }
+.input-hint { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
+.input-warning { font-size: 0.75rem; color: var(--warning); margin-top: 4px; }
+.input-error { font-size: 0.75rem; color: var(--danger); margin-top: 4px; }
 
 /* Range Slider */
 input[type="range"] {
@@ -275,7 +288,7 @@ input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
 .microscope-viewport {
     width: 350px; height: 350px; border-radius: 50%;
     background: rgba(0,0,0,0.4); border: 2px solid var(--border);
-    overflow: hidden; position: relative; flex-shrink: 0;
+    overflow: hidden; position: relative; flex-shrink: 0; box-sizing: border-box;
 }
 .microscope-viewport canvas { width: 100%; height: 100%; }
 .viewport-badge {
@@ -374,7 +387,9 @@ summary:hover { background: rgba(255,255,255,0.06); }
 .timer-card.countdown.running { border-color: var(--emerald-border); background: var(--emerald-bg); }
 .timer-card.stopwatch.running { border-color: var(--blue-border); background: var(--blue-bg); }
 .timer-card.expired { border-color: rgba(239,68,68,0.4); background: var(--danger-bg); animation: pulse 1s infinite; }
+.timer-card.expired.persistent-alerting { animation: alertFlash 0.5s ease-in-out; }
 @keyframes pulse { 0%,100% { border-color: rgba(239,68,68,0.4); } 50% { border-color: rgba(239,68,68,0.8); } }
+@keyframes alertFlash { 0%,100% { background: var(--danger-bg); } 50% { background: rgba(239,68,68,0.25); } }
 
 .timer-main { padding: 14px 16px; }
 .timer-top { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
@@ -406,6 +421,10 @@ summary:hover { background: rgba(255,255,255,0.06); }
 .countdown.running .timer-display { color: var(--emerald); }
 .stopwatch.running .timer-display { color: var(--blue); }
 .expired .timer-display { color: var(--danger); }
+
+.timer-pause-info {
+    font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;
+}
 
 .timer-actions { display: flex; gap: 4px; }
 .timer-actions button {
@@ -448,7 +467,7 @@ summary:hover { background: rgba(255,255,255,0.06); }
 .log-dot.reset { background: var(--text-muted); }
 .log-dot.finish { background: var(--danger); }
 .log-entry .log-action { color: var(--text-secondary); flex: 1; }
-.log-entry .log-elapsed { color: var(--text-muted); font-size: 0.66rem; }
+.log-entry .log-elapsed { color: var(--text-muted); font-size: 0.7rem; }
 
 /* Add Timer */
 .add-section { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border); }
@@ -622,7 +641,7 @@ summary:hover { background: rgba(255,255,255,0.06); }
 <header class="header">
     <div class="header-left">
         <i class="fa-solid fa-microscope"></i>
-        <h1>细胞实验工具箱</h1>
+        <h1>生物实验工具箱</h1>
     </div>
     <div class="header-right">
         <button class="btn-header export-btn" onclick="exportAllRecords()" title="导出所有记录到剪贴板">
@@ -660,7 +679,7 @@ summary:hover { background: rgba(255,255,255,0.06); }
         </div>
         <div class="tool-grid">
             <div class="tool-card" onclick="navigateTo('cell-counting', '细胞培养')">
-                <div class="tool-icon"><i class="fa-solid fa-table-cells"></i></div>
+                <div class="tool-icon"><i class="fa-solid fa-border-all"></i></div>
                 <div class="tool-name">细胞计数</div>
                 <div class="tool-eng">Plating</div>
             </div>
@@ -670,7 +689,7 @@ summary:hover { background: rgba(255,255,255,0.06); }
                 <div class="tool-eng">Passage</div>
             </div>
             <div class="tool-card" onclick="navigateTo('density-simulator', '细胞培养')">
-                <div class="tool-icon"><i class="fa-solid fa-chart-simple"></i></div>
+                <div class="tool-icon"><div class="density-icon-custom"></div></div>
                 <div class="tool-name">密度模拟</div>
                 <div class="tool-eng">Density</div>
             </div>
@@ -680,7 +699,7 @@ summary:hover { background: rgba(255,255,255,0.06); }
                 <div class="tool-eng">Vessel</div>
             </div>
             <div class="tool-card" onclick="navigateTo('well-plate', '细胞培养')">
-                <div class="tool-icon"><i class="fa-solid fa-border-all"></i></div>
+                <div class="tool-icon"><i class="fa-solid fa-table-cells"></i></div>
                 <div class="tool-name">孔板布局</div>
                 <div class="tool-eng">Plate Layout</div>
             </div>
@@ -693,7 +712,7 @@ summary:hover { background: rgba(255,255,255,0.06); }
     </div>
 
     <!-- 溶液配制 -->
-    <div class="category-card">
+    <div class="category-card emerald">
         <div class="cat-header">
             <div class="cat-icon"><i class="fa-solid fa-flask"></i></div>
             <div>
@@ -722,7 +741,7 @@ summary:hover { background: rgba(255,255,255,0.06); }
     </div>
 
     <!-- 其他功能 -->
-    <div class="category-card">
+    <div class="category-card emerald">
         <div class="cat-header">
             <div class="cat-icon"><i class="fa-solid fa-cubes"></i></div>
             <div>
@@ -1187,10 +1206,23 @@ summary:hover { background: rgba(255,255,255,0.06); }
 </div>
 
 </div><!-- /tool-panels-container -->
+
+<!-- Contact modal -->
+<div class="wp-modal-overlay" id="contactModal" onclick="if(event.target===this)closeContactModal()">
+    <div class="wp-modal">
+        <div class="wp-modal-handle"></div>
+        <div class="wp-modal-title">联系我们</div>
+        <p style="font-size:0.84rem;color:var(--text-secondary);margin-bottom:12px;line-height:1.5;">如遇bug或有改进建议，欢迎邮件联系</p>
+        <div style="display:flex;align-items:center;gap:8px;background:var(--bg-input);border:1px solid var(--border);border-radius:8px;padding:10px 14px;">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:0.94rem;color:var(--emerald);flex:1;text-align:center;">1356496415@qq.com</span>
+        </div>
+    </div>
+</div>
+
 </main>
 
 <footer class="footer">
-    <p>Cell Lab Toolkit v3.0 | 为细胞培养实验设计</p>
+    <p>BioLab Toolkit developed by coolcoldplay</p>
 </footer>
 
 <script>
@@ -1201,7 +1233,10 @@ function showToast(msg, type='info', dur=3000) {
     setTimeout(() => t.classList.remove('show'), dur);
 }
 function showContactInfo() {
-    showToast('📧 1356496415@qq.com — 遇到Bug或有改进建议，请发送邮件', 'info', 5000);
+    document.getElementById('contactModal').classList.add('show');
+}
+function closeContactModal() {
+    document.getElementById('contactModal').classList.remove('show');
 }
 function now() { const d = new Date(); return d.toLocaleTimeString('zh-CN', {hour12:false}); }
 
@@ -1210,7 +1245,7 @@ function toggleTheme() {
     const html = document.documentElement;
     const isLight = html.dataset.theme === 'light';
     html.dataset.theme = isLight ? 'dark' : 'light';
-    localStorage.setItem('cellcal-theme', isLight ? 'dark' : 'light');
+    try { localStorage.setItem('cellcal-theme', isLight ? 'dark' : 'light'); } catch(e) {}
     updateThemeIcon();
     // Redraw microscope if visible
     if (currentTool === 'density-simulator' && canvasReady) drawMicroscopeView();
@@ -1225,7 +1260,8 @@ function updateThemeIcon() {
 }
 
 function initTheme() {
-    const saved = localStorage.getItem('cellcal-theme');
+    var saved;
+    try { saved = localStorage.getItem('cellcal-theme'); } catch(e) { saved = null; }
     document.documentElement.dataset.theme = saved || 'dark';
     updateThemeIcon();
 }
@@ -1274,9 +1310,9 @@ function exportAllRecords() {
 
     text += '══════ 结束 ══════\n';
 
-    navigator.clipboard.writeText(text).then(() => {
+    navigator.clipboard.writeText(text).then(function() {
         showToast('已复制 ' + calcRecords.length + ' 条计算记录 + ' + allTimerLogs.length + ' 个计时器日志到剪贴板', 'success', 3500);
-    }).catch(() => {
+    }).catch(function() {
         showToast('复制失败，请检查浏览器权限', 'error');
     });
 }
@@ -1449,7 +1485,7 @@ const microscopeCanvas=document.getElementById('microscopeCanvas');
 const ctx=microscopeCanvas.getContext('2d');
 function initCanvas() {
     const vp=document.querySelector('.microscope-viewport');
-    canvasSize=vp&&vp.offsetWidth>50?Math.min(vp.offsetWidth,vp.offsetHeight):window.innerWidth<=768?280:350;
+    canvasSize=vp&&vp.clientWidth>50?Math.min(vp.clientWidth,vp.clientHeight):window.innerWidth<=768?280:350;
     const dpr=window.devicePixelRatio||1;
     microscopeCanvas.width=canvasSize*dpr; microscopeCanvas.height=canvasSize*dpr;
     microscopeCanvas.style.width=canvasSize+'px'; microscopeCanvas.style.height=canvasSize+'px';
@@ -1844,9 +1880,20 @@ function toggleAlertPref(type) {
 }
 
 let audioCtx = null;
+function ensureAudioCtx() {
+    if (!audioCtx) {
+        try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+    }
+    if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume().catch(function(){});
+    }
+}
+document.addEventListener('click', ensureAudioCtx, { once: true });
+document.addEventListener('touchstart', ensureAudioCtx, { once: true });
 function playBeep() {
     try {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        ensureAudioCtx();
+        if (!audioCtx) return;
         const now = audioCtx.currentTime;
         [440, 880, 440].forEach((freq, i) => {
             const osc = audioCtx.createOscillator();
@@ -1869,16 +1916,14 @@ function doVibrate() {
 }
 
 function stopContinuousAlert(timerId) {
-    if (activeAlerts[timerId]) {
-        clearInterval(activeAlerts[timerId]);
-        delete activeAlerts[timerId];
-    }
+    delete activeAlerts[timerId];
 }
 
 function dismissTimerAlert(timer) {
     stopContinuousAlert(timer.id);
     timer.logs.push({ time: now(), action: '停止提醒', elapsed: timer.mode === 'countdown' ? '超时 ' + formatTime(-timer.remaining) : '已用时 ' + formatTime(timer.elapsed), type: 'finish' });
     timer.expired = false;
+    timer.running = false;
     updateAllTimerDisplays();
     if (navigator.vibrate) navigator.vibrate(0);
 }
@@ -1887,19 +1932,29 @@ function triggerTimerAlert(timer) {
     doVibrate();
     if (alertPrefs.sound) playBeep();
     if (Notification.permission === 'granted') {
-        new Notification('计时器到期', { body: timer.label + ' — 倒计时结束' });
+        try { new Notification('计时器到期', { body: timer.label + ' — 倒计时结束' }); } catch(e) {}
     }
     if (alertPrefs.persistent) {
-        // Start repeating alert every 2.5 seconds
-        const existing = activeAlerts[timer.id];
-        if (existing) clearInterval(existing);
-        activeAlerts[timer.id] = setInterval(() => {
-            doVibrate();
-            if (alertPrefs.sound) playBeep();
-        }, 2500);
+        activeAlerts[timer.id] = true;
+        timer.lastAlertTime = 0;
         showToast(timer.label + ' 倒计时结束！持续提醒中…', 'warning', 3000);
     } else {
         showToast(timer.label + ' 倒计时结束！', 'warning', 5000);
+    }
+}
+
+function recalcTimer(t) {
+    if (!t.running || !t.startedAt) return;
+    const totalElapsed = t.accElapsed + (Date.now() - t.startedAt) / 1000;
+    if (t.mode === 'countdown') {
+        t.remaining = t.totalSec - Math.floor(totalElapsed);
+        if (t.remaining <= 0 && !t.expired) {
+            t.expired = true;
+            t.logs.push({ time: now(), action: '结束', elapsed: '到期', type: 'finish' });
+            triggerTimerAlert(t);
+        }
+    } else {
+        t.elapsed = Math.floor(totalElapsed);
     }
 }
 
@@ -1917,6 +1972,7 @@ function addTimer(minutes) {
     timers.push({
         id, label: customName || '计时器 ' + id, mode: 'countdown',
         totalSec, remaining: totalSec, running: false, expired: false,
+        startedAt: null, accElapsed: 0, totalPausedSec: 0, pauseStartedAt: null, lastAlertTime: 0,
         logs: [{ time: now(), action: '创建', elapsed: '倒计时 ' + minutes + ':00', type: 'reset' }]
     });
     renderAllTimers();
@@ -1928,6 +1984,7 @@ function addStopwatch() {
     timers.push({
         id, label: customName || '计时器 ' + id, mode: 'stopwatch',
         totalSec: 0, elapsed: 0, running: false, expired: false,
+        startedAt: null, accElapsed: 0, totalPausedSec: 0, pauseStartedAt: null, lastAlertTime: 0,
         logs: [{ time: now(), action: '创建', elapsed: '正计时 00:00', type: 'start' }]
     });
     renderAllTimers();
@@ -1948,7 +2005,17 @@ function setCustomMode(mode) {
 
 function startTimer(timer) {
     timer.running = true;
-    timer.expired = false;
+    if (timer.remaining > 0) timer.expired = false;
+    timer.startedAt = Date.now();
+    if (timer.mode === 'stopwatch' && timer.pauseStartedAt) {
+        timer.totalPausedSec = (timer.totalPausedSec || 0) + (Date.now() - timer.pauseStartedAt) / 1000;
+        timer.pauseStartedAt = null;
+    }
+    if (timer.mode === 'countdown') {
+        timer.accElapsed = timer.totalSec - timer.remaining;
+    } else {
+        timer.accElapsed = timer.elapsed;
+    }
     const action = timer.logs.length === 0 || timer.logs[timer.logs.length - 1].type === 'reset' ? '开始' : '继续';
     timer.logs.push({ time: now(), action, elapsed: timer.mode === 'countdown' ? '剩余 ' + formatTime(timer.remaining) : '已用时 ' + formatTime(timer.elapsed), type: action === '开始' ? 'start' : 'resume' });
     ensureInterval();
@@ -1956,14 +2023,28 @@ function startTimer(timer) {
 }
 
 function pauseTimer(timer) {
+    recalcTimer(timer);
+    timer.accElapsed = timer.mode === 'countdown' ? timer.totalSec - timer.remaining : timer.elapsed;
+    timer.startedAt = null;
     timer.running = false;
-    timer.logs.push({ time: now(), action: '暂停', elapsed: timer.mode === 'countdown' ? '剩余 ' + formatTime(timer.remaining) : '已用时 ' + formatTime(timer.elapsed), type: 'pause' });
+    if (timer.mode === 'stopwatch') {
+        timer.pauseStartedAt = Date.now();
+    }
+    const overtime = timer.mode === 'countdown' && timer.remaining < 0;
+    timer.logs.push({ time: now(), action: '暂停', elapsed: overtime ? '超时 ' + formatTime(-timer.remaining) : (timer.mode === 'countdown' ? '剩余 ' + formatTime(timer.remaining) : '已用时 ' + formatTime(timer.elapsed)), type: 'pause' });
     renderAllTimers();
 }
 
 function resetTimer(timer) {
+    stopContinuousAlert(timer.id);
+    if (navigator.vibrate) navigator.vibrate(0);
     timer.running = false;
     timer.expired = false;
+    timer.startedAt = null;
+    timer.accElapsed = 0;
+    timer.totalPausedSec = 0;
+    timer.pauseStartedAt = null;
+    timer.lastAlertTime = 0;
     if (timer.mode === 'countdown') {
         timer.remaining = timer.totalSec;
     } else {
@@ -1988,6 +2069,11 @@ function deleteTimer(timer) {
 function toggleTimerMode(timer) {
     if (timer.running) return;
     timer.mode = timer.mode === 'countdown' ? 'stopwatch' : 'countdown';
+    timer.startedAt = null;
+    timer.accElapsed = 0;
+    timer.totalPausedSec = 0;
+    timer.pauseStartedAt = null;
+    timer.lastAlertTime = 0;
     if (timer.mode === 'stopwatch') { timer.elapsed = 0; }
     else { timer.remaining = timer.totalSec; }
     timer.logs.push({ time: now(), action: '切换模式', elapsed: timer.mode === 'countdown' ? '倒计时 ' + formatTime(timer.totalSec) : '正计时', type: 'reset' });
@@ -1996,27 +2082,33 @@ function toggleTimerMode(timer) {
 
 function ensureInterval() {
     if (timerInterval) return;
-    timerInterval = setInterval(() => {
-        let changed = false;
-        timers.forEach(t => {
-            if (!t.running) return;
-            changed = true;
-            if (t.mode === 'countdown') {
-                t.remaining--;
-                if (t.remaining <= 0) {
-                    t.remaining = 0;
-                    t.running = false;
-                    t.expired = true;
-                    t.logs.push({ time: now(), action: '结束', elapsed: '00:00（到期）', type: 'finish' });
-                    triggerTimerAlert(t);
+    timerInterval = setInterval(function() {
+        try {
+            let changed = false;
+            timers.forEach(function(t) {
+                if (t.running) { changed = true; recalcTimer(t); }
+                else if (t.mode === 'stopwatch' && t.pauseStartedAt) { changed = true; }
+            });
+            // Persistent alert pulse: check expired timers with active alerts
+            timers.forEach(function(t) {
+                if (!t.expired || !activeAlerts[t.id]) return;
+                changed = true;
+                const elapsed = Date.now() - t.lastAlertTime;
+                if (t.lastAlertTime === 0 || elapsed >= 2500) {
+                    t.lastAlertTime = Date.now();
+                    doVibrate();
+                    if (alertPrefs.sound) playBeep();
+                    const card = document.getElementById('timer-' + t.id);
+                    if (card) {
+                        card.classList.add('persistent-alerting');
+                        setTimeout(function(){ card.classList.remove('persistent-alerting'); }, 800);
+                    }
                 }
-            } else {
-                t.elapsed++;
-            }
-        });
-        if (changed) updateAllTimerDisplays();
-        const anyRunning = timers.some(t => t.running);
-        if (!anyRunning && timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+            });
+            if (changed) updateAllTimerDisplays();
+            const anyActive = timers.some(function(t) { return t.running || (t.mode === 'stopwatch' && t.pauseStartedAt) || (t.expired && activeAlerts[t.id]); });
+            if (!anyActive && timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+        } catch(e) { /* prevent interval death on runtime errors */ }
     }, 1000);
 }
 
@@ -2050,10 +2142,22 @@ function updateAllTimerDisplays() {
         if (dismissBar) {
             dismissBar.style.display = activeAlerts[t.id] ? 'block' : 'none';
         }
+        // Update pause info for paused stopwatches
+        const pauseInfo = card.querySelector('.timer-pause-info');
+        if (pauseInfo) {
+            if (t.mode === 'stopwatch' && !t.running && !t.expired && t.pauseStartedAt) {
+                const cur = Math.floor((Date.now() - t.pauseStartedAt) / 1000);
+                const tot = Math.floor(t.totalPausedSec || 0);
+                pauseInfo.innerHTML = '<div>已暂停 ' + formatTime(cur) + '</div><div>累计暂停 ' + formatTime(tot) + '</div>';
+                pauseInfo.style.display = '';
+            } else {
+                pauseInfo.style.display = 'none';
+            }
+        }
     });
 
-    // Check if all stopped
-    if (!timers.some(t => t.running) && timerInterval) {
+    // Check if all stopped (keep running for paused stopwatches showing pause duration)
+    if (!timers.some(t => t.running || (t.mode === 'stopwatch' && t.pauseStartedAt)) && timerInterval) {
         clearInterval(timerInterval);
         timerInterval = null;
     }
@@ -2081,13 +2185,18 @@ function renderAllTimers() {
         html += '</div></div>';
         html += '<div class="timer-bottom">';
         html += '<div class="timer-display">' + display + '</div>';
+        // Pause duration info for paused stopwatches
+        const showPause = t.mode === 'stopwatch' && !t.running && !t.expired && t.pauseStartedAt;
+        const curPause = showPause ? Math.floor((Date.now() - t.pauseStartedAt) / 1000) : 0;
+        const totPause = Math.floor(t.totalPausedSec || 0);
+        html += '<div class="timer-pause-info" style="' + (showPause ? '' : 'display:none;') + '"><div>已暂停 ' + formatTime(curPause) + '</div><div>累计暂停 ' + formatTime(totPause) + '</div></div>';
         html += '<div class="timer-actions">';
         html += playBtn;
         html += '<button class="btn-t-reset" onclick="resetTimer(timers.find(x=>x.id===' + t.id + '))" title="重置"><i class="fa-solid fa-rotate-right"></i></button>';
         html += '<button class="btn-t-delete" onclick="deleteTimer(timers.find(x=>x.id===' + t.id + '))" title="删除"><i class="fa-solid fa-xmark"></i></button>';
         html += '</div></div>';
-        // Dismiss alert button (hidden by default, shown for persistent alerts)
-        html += '<div class="dismiss-alert-bar" style="display:none;padding:6px 16px;border-top:1px solid rgba(239,68,68,0.3);">';
+        // Dismiss alert button (shown for persistent alerts)
+        html += '<div class="dismiss-alert-bar" style="display:' + (activeAlerts[t.id] ? 'block' : 'none') + ';padding:6px 16px;border-top:1px solid rgba(239,68,68,0.3);">';
         html += '<button class="btn btn-primary" onclick="dismissTimerAlert(timers.find(x=>x.id===' + t.id + '))" style="width:100%;padding:6px;font-size:0.78rem;background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.3);border-radius:6px;"><i class="fa-solid fa-check"></i> 确认停止提醒</button>';
         html += '</div></div>';
 
@@ -2112,6 +2221,18 @@ function renderAllTimers() {
 if ('Notification' in window && Notification.permission === 'default') {
     Notification.requestPermission();
 }
+
+// Recalculate timers when tab becomes visible (handles mobile browser throttling)
+document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+        timers.forEach(t => recalcTimer(t));
+        updateAllTimerDisplays();
+    }
+});
+window.addEventListener('pageshow', () => {
+    timers.forEach(t => recalcTimer(t));
+    updateAllTimerDisplays();
+});
 
 // ==================== WELL PLATE LAYOUT ====================
 const ROW_LABELS = 'ABCDEFGHIJKLMNOP'.split('');
@@ -2419,9 +2540,9 @@ const plateState = {
                 tsv += [p.name, p.color, p.cellName, p.drugName, p.concentration, p.treatmentTime, p.notes].join('\t') + '\n';
             });
         }
-        navigator.clipboard.writeText(tsv).then(() => {
+        navigator.clipboard.writeText(tsv).then(function() {
             showToast('孔板布局已复制到剪贴板（TSV格式），可直接粘贴到Excel', 'success', 3500);
-        }).catch(() => {
+        }).catch(function() {
             showToast('复制失败，请检查浏览器权限', 'error');
         });
         // Record
