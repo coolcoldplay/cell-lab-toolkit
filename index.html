@@ -841,14 +841,15 @@ summary:hover { background: rgba(255,255,255,0.06); }
                     </div>
                     <div class="input-group"><label>铺板细胞总数</label><input type="number" id="simCellCount" value="500000" min="1000" max="50000000" step="1000"></div>
                     <div class="input-group"><label>细胞大小: <span id="simCellSizeValue">15</span> μm</label><input type="range" id="simCellSize" min="5" max="40" value="15" step="1"><div class="input-hint">HEK293: 10-15μm, HeLa: 15-20μm</div></div>
+                    <div class="input-group"><label>视场数 FN (mm)</label><input type="number" id="simFieldNumber" value="20" min="10" max="30" step="0.5"><div class="input-hint">视野直径按 FOV = FN × 1000 / 物镜倍率 计算</div></div>
                     <div class="input-group"><label>显微镜放大倍数</label>
                         <div class="mag-buttons">
-                            <button class="mag-btn" data-mag="40"><div class="mag-label">4×</div><div class="mag-total">40×</div></button>
-                            <button class="mag-btn active" data-mag="100"><div class="mag-label">10×</div><div class="mag-total">100×</div></button>
-                            <button class="mag-btn" data-mag="400"><div class="mag-label">40×</div><div class="mag-total">400×</div></button>
+                            <button class="mag-btn" data-mag="40" data-objective="4" data-fn="18"><div class="mag-label">4×</div><div class="mag-total">40×</div></button>
+                            <button class="mag-btn active" data-mag="100" data-objective="10" data-fn="20"><div class="mag-label">10×</div><div class="mag-total">100×</div></button>
+                            <button class="mag-btn" data-mag="400" data-objective="40" data-fn="20"><div class="mag-label">40×</div><div class="mag-total">400×</div></button>
                         </div>
                     </div>
-                    <button id="updateViewBtn" class="btn btn-primary btn-block" style="margin-top:14px;"><i class="fa-solid fa-rotate"></i> 更新视野</button>
+                    <button id="updateViewBtn" class="btn btn-primary btn-block" style="margin-top:14px;"><i class="fa-solid fa-rotate"></i> 重采样</button>
                 </div>
             </div>
             <div>
@@ -860,6 +861,7 @@ summary:hover { background: rgba(255,255,255,0.06); }
                 <div class="info-item"><span class="info-label">细胞密度</span><span class="info-value" id="simCellDensity">-</span></div>
                 <div class="info-item"><span class="info-label">视野直径</span><span class="info-value" id="simFovDiameter">-</span></div>
                 <div class="info-item"><span class="info-label">视野内细胞</span><span class="info-value" id="simCellsInView">-</span></div>
+                <div class="info-item"><span class="info-label">FOV计算依据</span><span class="info-value" id="simFovBasis">-</span></div>
             </div>
         </div>
     </div>
@@ -1479,7 +1481,7 @@ document.getElementById('calculatePlatingBtn').addEventListener('click', () => {
 });
 
 // ==================== DENSITY SIMULATOR ====================
-const FOV_DIAMETERS={40:4500,100:2000,400:500};
+const MAGNIFICATION_PRESETS={40:{objective:4,fn:18},100:{objective:10,fn:20},400:{objective:40,fn:20}};
 let currentMagnification=100,canvasReady=false,canvasSize=350,cellData=[];
 const microscopeCanvas=document.getElementById('microscopeCanvas');
 const ctx=microscopeCanvas.getContext('2d');
@@ -1492,47 +1494,78 @@ function initCanvas() {
     ctx.setTransform(1,0,0,1,0,0); ctx.scale(dpr,dpr);
     canvasReady=true;
 }
-function generateCellDistribution() {
-    const area=parseFloat(document.getElementById('simVesselType').value);
-    const totalCells=parseInt(document.getElementById('simCellCount').value)||500000;
-    const cellSize=parseInt(document.getElementById('simCellSize').value)||15;
-    const fovD=FOV_DIAMETERS[currentMagnification];
+function getSimulationParams(){
+    const area=Math.max(0.01,parseFloat(document.getElementById('simVesselType').value)||9.6);
+    const totalCells=Math.max(0,parseInt(document.getElementById('simCellCount').value)||500000);
+    const cellSize=Math.max(3,parseInt(document.getElementById('simCellSize').value)||15);
+    const fn=Math.max(5,parseFloat(document.getElementById('simFieldNumber').value)||20);
+    const objective=(MAGNIFICATION_PRESETS[currentMagnification]&&MAGNIFICATION_PRESETS[currentMagnification].objective)||10;
+    const fovD=Math.max(100,(fn*1000)/objective);
+    return {area,totalCells,cellSize,fn,objective,fovD};
+}
+function generateCellDistribution(params,mode='auto') {
+    const {area,totalCells,cellSize,fovD}=params;
     const fovArea=Math.PI*Math.pow(fovD/2,2);
     const vesselArea=area*1e8;
     const expected=Math.round((totalCells*fovArea)/vesselArea);
     const density=totalCells/area;
     const satDensity=1000000;
-    const cr=density/satDensity;
+    const cr=Math.min(2,density/satDensity);
     let mdf=cr<0.2?0.6:cr<0.5?0.3:cr<0.8?0.15:0.08;
-    const minDist=cellSize*mdf;
-    cellData=[];
-    for(let i=0;i<expected*3&&cellData.length<Math.min(expected*1.2,3000);i++){
+    const radius=cellSize/2;
+    const minDist=(radius*2)*mdf;
+    const quality=mode==='resample'?1.2:1;
+    const maxRenderable=Math.max(300,Math.min(Math.floor(canvasSize*canvasSize*0.05*quality),12000));
+    const targetCount=Math.max(0,Math.min(expected,maxRenderable));
+    const gridSize=Math.max(minDist,cellSize*0.5,4);
+    const grid=new Map();
+    const key=(gx,gy)=>gx+'|'+gy;
+    const cells=[];
+    let attempts=0;
+    const maxAttempts=Math.max(targetCount*12,1500);
+    while(cells.length<targetCount && attempts<maxAttempts){
+        attempts++;
         const angle=Math.random()*2*Math.PI;
         const r=Math.sqrt(Math.random())*(fovD/2);
         const x=r*Math.cos(angle), y=r*Math.sin(angle);
+        const gx=Math.floor((x+fovD/2)/gridSize), gy=Math.floor((y+fovD/2)/gridSize);
         let tooClose=false;
-        for(const c of cellData){if(Math.sqrt((x-c.x)**2+(y-c.y)**2)<minDist){tooClose=true;break;}}
-        if(!tooClose) cellData.push({x,y,size:cellSize*(0.8+Math.random()*0.4)});
+        for(let ix=-1;ix<=1&&!tooClose;ix++){
+            for(let iy=-1;iy<=1;iy++){
+                const neighbors=grid.get(key(gx+ix,gy+iy));
+                if(!neighbors) continue;
+                for(const idx of neighbors){
+                    const c=cells[idx];
+                    if(Math.sqrt((x-c.x)**2+(y-c.y)**2)<minDist){tooClose=true;break;}
+                }
+                if(tooClose) break;
+            }
+        }
+        if(!tooClose){
+            cells.push({x,y,size:cellSize*(0.8+Math.random()*0.4)});
+            const k=key(gx,gy); if(!grid.has(k)) grid.set(k,[]); grid.get(k).push(cells.length-1);
+        }
     }
-    return expected;
+    return {expected,generated:cells.length,cells,samplingLimited:expected>maxRenderable};
 }
-function drawMicroscopeView() {
+function drawMicroscopeView(mode='auto') {
     if(!canvasReady) initCanvas();
-    const area=parseFloat(document.getElementById('simVesselType').value);
-    const cellCount=parseInt(document.getElementById('simCellCount').value)||500000;
-    const fovD=FOV_DIAMETERS[currentMagnification];
-    const expected=generateCellDistribution();
-    const density=cellCount/area;
+    const params=getSimulationParams();
+    const {area,totalCells,fovD,fn,objective}=params;
+    const distribution=generateCellDistribution(params,mode);
+    cellData=distribution.cells;
+    const density=totalCells/area;
     document.getElementById('simCellDensity').textContent=(density/10000).toFixed(2)+' ×10⁴/cm²';
     document.getElementById('simFovDiameter').textContent=(fovD/1000).toFixed(2)+' mm';
-    document.getElementById('simCellsInView').textContent=expected.toLocaleString();
+    document.getElementById('simCellsInView').textContent=distribution.generated.toLocaleString()+'（理论 '+distribution.expected.toLocaleString()+'）';
+    document.getElementById('simFovBasis').textContent='FN '+fn.toFixed(1)+' / '+objective+'×';
     document.getElementById('currentMag').textContent=currentMagnification+'×';
+    if(distribution.samplingLimited) showToast('当前密度较高：已按画布性能预算采样渲染','warning');
     const cx=canvasSize/2, cy=canvasSize/2, radius=canvasSize/2-10;
     const scale=(radius*2)/fovD;
     ctx.clearRect(0,0,canvasSize,canvasSize);
     ctx.fillStyle=document.documentElement.dataset.theme==='light'?'#e8ecf0':'#121a24'; ctx.beginPath(); ctx.arc(cx,cy,radius,0,Math.PI*2); ctx.fill();
-    const cellsInView=cellData.filter(c=>Math.sqrt(c.x**2+c.y**2)<=fovD/2);
-    cellsInView.forEach(c=>{
+    cellData.forEach(c=>{
         const px=cx+c.x*scale, py=cy+c.y*scale, pr=(c.size/2)*scale;
         if(pr>0.5){
             const g=Math.floor(120+Math.random()*30);
@@ -1550,16 +1583,20 @@ function drawMicroscopeView() {
     ctx.strokeStyle='#2d3748'; ctx.lineWidth=2.5;
     ctx.beginPath(); ctx.arc(cx,cy,radius,0,Math.PI*2); ctx.stroke();
 }
+const debouncedDraw=(()=>{let t; return ()=>{clearTimeout(t); t=setTimeout(()=>drawMicroscopeView('auto'),150);};})();
 document.querySelectorAll('.mag-btn').forEach(b=>{
     b.addEventListener('click',()=>{
         document.querySelectorAll('.mag-btn').forEach(x=>x.classList.remove('active'));
         b.classList.add('active'); currentMagnification=parseInt(b.dataset.mag);
+        const preset=MAGNIFICATION_PRESETS[currentMagnification];
+        if(preset){document.getElementById('simFieldNumber').value=preset.fn;}
         if(!canvasReady) initCanvas();
-        drawMicroscopeView();
+        drawMicroscopeView('auto');
     });
 });
-document.getElementById('simCellSize').addEventListener('input',e=>{document.getElementById('simCellSizeValue').textContent=e.target.value;});
-document.getElementById('updateViewBtn').addEventListener('click',()=>{if(!canvasReady)initCanvas();drawMicroscopeView();showToast('视野已更新','success');});
+document.getElementById('simCellSize').addEventListener('input',e=>{document.getElementById('simCellSizeValue').textContent=e.target.value;debouncedDraw();});
+['simVesselType','simCellCount','simFieldNumber'].forEach(id=>{document.getElementById(id).addEventListener('input',debouncedDraw);document.getElementById(id).addEventListener('change',debouncedDraw);});
+document.getElementById('updateViewBtn').addEventListener('click',()=>{if(!canvasReady)initCanvas();drawMicroscopeView('resample');showToast('视野已重采样','success');});
 
 // ==================== PASSAGE CALCULATOR ====================
 document.getElementById('passageCellLine').addEventListener('change',e=>{
