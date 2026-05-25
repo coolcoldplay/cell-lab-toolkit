@@ -944,6 +944,22 @@ summary:hover { background: rgba(255,255,255,0.06); }
         </div>
         <button id="calculateMolarBtn" class="btn btn-primary btn-block" style="margin-top:18px;"><i class="fa-solid fa-calculator"></i> 计算</button>
         <div id="molarResult" class="result-section hidden"><div class="result-title">计算结果</div><div class="result-value" id="molarResultText">-</div></div>
+
+        <div class="form-section" style="margin-top:18px;">
+            <div class="section-title">DMSO限制换算</div>
+            <div class="form-grid">
+                <div class="input-group"><label>母液浓度</label><div class="input-row"><input type="number" id="dmsoStockConcentration" min="0" step="0.001" placeholder="如：10"><select id="dmsoStockConcUnit" class="unit-select"><option value="mol/L">mol/L</option><option value="mmol/L" selected>mmol/L</option><option value="μmol/L">μmol/L</option><option value="nmol/L">nmol/L</option></select></div></div>
+                <div class="input-group"><label>细胞可接受DMSO (%)</label><input type="number" id="dmsoFinalPercent" min="0" max="100" step="0.01" placeholder="如：0.1"></div>
+                <div class="input-group"><label>母液DMSO (%)</label><input type="number" id="dmsoStockPercent" min="0" max="100" step="0.1" value="100"></div>
+            </div>
+            <button id="calculateDmsoBtn" class="btn btn-secondary btn-block" style="margin-top:14px;"><i class="fa-solid fa-vial-circle-check"></i> 计算DMSO限制</button>
+            <div id="dmsoResult" class="result-section hidden">
+                <div class="result-grid">
+                    <div class="result-card primary"><div class="label">最大终浓度</div><div class="value" id="dmsoMaxConcentration">-</div></div>
+                    <div class="result-card"><div class="label">最低稀释倍数</div><div class="value" id="dmsoDilutionFold">-</div></div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -956,6 +972,7 @@ summary:hover { background: rgba(255,255,255,0.06); }
                 <div class="section-title">母液参数</div>
                 <div class="input-group"><label>药物名称（可选）</label><input type="text" id="dilutionDrugName" placeholder="如：Cisplatin"></div>
                 <div class="input-group"><label>母液浓度 (C₁)</label><div class="input-row"><input type="number" id="stockConcentration" min="0" step="0.001" placeholder="初始浓度"><select id="stockConcUnit" class="unit-select"><option value="mol/L">mol/L</option><option value="mmol/L" selected>mmol/L</option><option value="μmol/L">μmol/L</option><option value="nmol/L">nmol/L</option><option value="mg/mL">mg/mL</option><option value="μg/mL">μg/mL</option><option value="ng/mL">ng/mL</option></select></div></div>
+                <div class="input-group"><label>母液DMSO (%)</label><input type="number" id="dilutionStockDmsoPercent" min="0" max="100" step="0.1" value="100"></div>
                 <div class="input-group" id="dilutionMwGroup" style="display:none;"><label>分子量 (g/mol)</label><input type="number" id="dilutionMW" min="0" step="0.01" placeholder="跨类型换算需要"><div class="input-hint">摩尔浓度与质量浓度互转时需要</div></div>
             </div>
             <div class="form-section purple">
@@ -970,6 +987,7 @@ summary:hover { background: rgba(255,255,255,0.06); }
                 <div class="result-card primary"><div class="label">所需母液 (V₁)</div><div class="value" id="dilutionStockVol">-</div></div>
                 <div class="result-card"><div class="label">加入稀释液</div><div class="value" id="dilutionSolventVol">-</div></div>
                 <div class="result-card"><div class="label">稀释倍数</div><div class="value" id="dilutionFold">-</div></div>
+                <div class="result-card"><div class="label">终浓度DMSO</div><div class="value" id="dilutionFinalDmso">-</div></div>
             </div>
         </div>
     </div>
@@ -1393,6 +1411,29 @@ function formatNumber(v, d=4) {
     if (Math.abs(v)>=1e6||(Math.abs(v)<1e-6&&v!==0)) return v.toExponential(2);
     return Number(v.toFixed(d)).toString();
 }
+function getAppropriateMolarUnit(v) {
+    if (v>=1) return 'mol/L';
+    if (v>=1e-3) return 'mmol/L';
+    if (v>=1e-6) return 'μmol/L';
+    return 'nmol/L';
+}
+function calculateDmsoLimit(stockConcentrationBase, maxFinalDmsoPercent, stockDmsoPercent) {
+    if (stockConcentrationBase<=0) throw new Error('stock concentration must be greater than zero');
+    if (maxFinalDmsoPercent<=0||stockDmsoPercent<=0) throw new Error('DMSO percentages must be greater than zero');
+    if (maxFinalDmsoPercent>100||stockDmsoPercent>100) throw new Error('DMSO percentages cannot exceed 100');
+    if (maxFinalDmsoPercent>stockDmsoPercent) throw new Error('final DMSO cannot exceed stock DMSO');
+    const dilutionFold=stockDmsoPercent/maxFinalDmsoPercent;
+    return {
+        maxFinalConcentrationBase: stockConcentrationBase/dilutionFold,
+        dilutionFold
+    };
+}
+function calculateDilutionDmsoPercent(stockDmsoPercent, dilutionFold) {
+    if (stockDmsoPercent<=0) throw new Error('stock DMSO percent must be greater than zero');
+    if (stockDmsoPercent>100) throw new Error('stock DMSO percent cannot exceed 100');
+    if (dilutionFold<=0) throw new Error('dilution fold must be greater than zero');
+    return stockDmsoPercent/dilutionFold;
+}
 
 // ==================== CELL COUNTING ====================
 const countingState = { currentGrid: 1, counts: [0,0,0,0], completed: [false,false,false,false] };
@@ -1677,6 +1718,37 @@ document.getElementById('calculateMolarBtn').addEventListener('click',()=>{
     showToast('计算完成','success');
 });
 
+document.getElementById('calculateDmsoBtn').addEventListener('click',()=>{
+    const stockC=parseFloat(document.getElementById('dmsoStockConcentration').value);
+    const stockU=document.getElementById('dmsoStockConcUnit').value;
+    const finalDmso=parseFloat(document.getElementById('dmsoFinalPercent').value);
+    const stockDmso=parseFloat(document.getElementById('dmsoStockPercent').value);
+    if(isNaN(stockC)||stockC<=0||isNaN(finalDmso)||finalDmso<=0||isNaN(stockDmso)||stockDmso<=0){
+        showToast('请填写有效的DMSO换算参数','warning');
+        return;
+    }
+    try{
+        const stockBase=toBaseUnit(stockC,stockU,'molar');
+        const result=calculateDmsoLimit(stockBase,finalDmso,stockDmso);
+        const outUnit=getAppropriateMolarUnit(result.maxFinalConcentrationBase);
+        const outValue=fromBaseUnit(result.maxFinalConcentrationBase,outUnit,'molar');
+        document.getElementById('dmsoMaxConcentration').textContent=formatNumber(outValue)+' '+outUnit;
+        document.getElementById('dmsoDilutionFold').textContent=formatNumber(result.dilutionFold,1)+'×';
+        document.getElementById('dmsoResult').classList.remove('hidden');
+        recordCalc('DMSO限制换算',{
+            母液浓度:stockC+' '+stockU,
+            细胞可接受DMSO:finalDmso+'%',
+            母液DMSO:stockDmso+'%'
+        },{
+            最大终浓度:document.getElementById('dmsoMaxConcentration').textContent,
+            最低稀释倍数:document.getElementById('dmsoDilutionFold').textContent
+        });
+        showToast('计算完成','success');
+    }catch(error){
+        showToast(error.message,'error');
+    }
+});
+
 // ==================== DRUG DILUTION ====================
 function checkDilutionUnits() {
     const sU=document.getElementById('stockConcUnit').value;
@@ -1692,8 +1764,10 @@ document.getElementById('calculateDilutionBtn').addEventListener('click',()=>{
     const tU=document.getElementById('targetConcUnit').value;
     const tV=parseFloat(document.getElementById('targetVolume').value);
     const tVU=document.getElementById('targetVolumeUnit').value;
+    const stockDmso=parseFloat(document.getElementById('dilutionStockDmsoPercent').value);
     const mw=parseFloat(document.getElementById('dilutionMW').value);
     if(isNaN(sC)||sC<=0||isNaN(tC)||tC<=0||isNaN(tV)||tV<=0){showToast('请填写所有参数','warning');return;}
+    if(isNaN(stockDmso)||stockDmso<=0||stockDmso>100){showToast('请输入有效的母液DMSO百分比','warning');return;}
     const sIsM=isMolarUnit(sU), tIsM=isMolarUnit(tU);
     let sCB, tCB;
     if(sIsM&&tIsM){sCB=toBaseUnit(sC,sU,'molar');tCB=toBaseUnit(tC,tU,'molar');}
@@ -1712,12 +1786,13 @@ document.getElementById('calculateDilutionBtn').addEventListener('click',()=>{
     document.getElementById('dilutionStockVol').textContent=formatNumber(fromBaseUnit(sVL,sVU,'volume'))+' '+sVU;
     document.getElementById('dilutionSolventVol').textContent=formatNumber(fromBaseUnit(dVL,dVU,'volume'))+' '+dVU;
     document.getElementById('dilutionFold').textContent=formatNumber(fold,1)+'×';
+    document.getElementById('dilutionFinalDmso').textContent=formatNumber(calculateDilutionDmsoPercent(stockDmso,fold),3)+'%';
     document.getElementById('dilutionResult').classList.remove('hidden');
     const drugName=document.getElementById('dilutionDrugName').value.trim();
-    const params={母液浓度:sC+' '+sU,目标浓度:tC+' '+tU,目标体积:tV+' '+tVU};
+    const params={母液浓度:sC+' '+sU,母液DMSO:stockDmso+'%',目标浓度:tC+' '+tU,目标体积:tV+' '+tVU};
     if(drugName) params.药物名称=drugName;
     if(document.getElementById('dilutionMwGroup').style.display!=='none') params.分子量=(mw||'(未填)')+' g/mol';
-    recordCalc('药物稀释',params,{所需母液:document.getElementById('dilutionStockVol').textContent,加稀释液:document.getElementById('dilutionSolventVol').textContent,稀释倍数:formatNumber(fold,1)+'×'});
+    recordCalc('药物稀释',params,{所需母液:document.getElementById('dilutionStockVol').textContent,加稀释液:document.getElementById('dilutionSolventVol').textContent,稀释倍数:formatNumber(fold,1)+'×',终浓度DMSO:document.getElementById('dilutionFinalDmso').textContent});
     showToast('计算完成','success');
 });
 
